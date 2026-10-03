@@ -170,7 +170,9 @@ Due to budget constraints, it is not possible to build a hospital in every distr
 
 -    a hospital is built in a neighbouring district. Here, two districts are considered neighbours if they share a common border.
 
-    For example, District 1 has Districts 2, 3, and 4 as its neighbouring districts. Formulate an IP model that determines which districts should have hospitals built in them, and the minimum number of hospitals required to ensure that every district has access to at least one hospital in either its own district or a neighbouring district.\
+    For example, District 1 has Districts 2, 3, and 4 as its neighbouring districts. Formulate an IP model that determines which districts should have hospitals built in them, and the minimum number of hospitals required to ensure that every district has access to at least one hospital in either its own district or a neighbouring district.
+
+    ![](images/clipboard-740830155.png){width="336"}\
 
     ```{r}
 
