@@ -1,0 +1,95 @@
+---
+title: "Complemetarity in Systems Modelling- Summary"
+author: "Moi"
+format: html
+editor: visual
+---
+
+# Complementarity in Systems Modelling
+
+**Michael Pidd \| Quick Study Summary**
+
+## 1. The central argument
+
+**Complementarity means using different modelling approaches together because they provide different, mutually useful perspectives on the same situation.**
+
+-   **Hard OR** helps analyse and optimize a sufficiently well-defined problem.
+
+-   **Soft OR** helps explore ambiguous situations, understand stakeholders' perspectives and clarify what the problem actually is.
+
+Real-world decisions may benefit from both approaches.
+
+## 2. Hard OR vs Soft OR
+
+| Hard OR | Soft OR |
+|----|----|
+| Quantitative analysis | Exploring and structuring complex situations |
+| Uses mathematics, data and formal models | Uses stakeholder perspectives, discussion and conceptual models |
+| Asks: What is the optimal solution? | Asks: What is the problem, and whose objectives matter? |
+| Examples: linear programming, queueing theory and simulation | Examples: Soft Systems Methodology and rich pictures |
+
+The distinction is not simply mathematical versus non-mathematical. It concerns the nature of the problem and the purpose of modelling.
+
+## 3. Puzzles, problems and messes
+
+**Puzzles:** The question and rules are clear. The task is to find the answer.
+
+*Example:* Find the shortest route through a specified set of locations.
+
+**Problems:** The objective is reasonably clear, but constraints and trade-offs must be considered.
+
+*Example:* Allocate a limited budget to maximize network coverage.
+
+**Messes:** The situation itself is unclear or contested. Stakeholders may disagree about causes, objectives or what success means.
+
+*Example:* Poor connectivity involving infrastructure costs, affordability, geography and public policy.
+
+**Key implication:** A mess cannot necessarily be solved by optimizing a single objective function. The situation may first need to be understood and structured.
+
+## 4. What complementarity looks like in practice
+
+A complementary modelling process can follow this cycle:
+
+1.  **Explore and structure:** Understand the situation, assumptions, stakeholders and objectives.
+
+2.  **Analyse and evaluate:** Build quantitative models and compare alternatives.
+
+3.  **Interpret and learn:** Examine whether the results make sense in the real-world context.
+
+4.  **Revisit the model:** Adjust objectives, constraints or assumptions when new insights emerge.
+
+For example, an optimization model may identify the cheapest network upgrade plan. Stakeholder discussions may reveal that the plan excludes an underserved community. The model can then be revised and solved again.
+
+The process is iterative, not a rigid one-way sequence.
+
+## 5. Important distinctions
+
+-   Different modelling approaches have different strengths and limitations.
+
+-   Complementarity does not mean that every method must be used in every project.
+
+-   Qualitative judgements and quantitative measurements are different forms of evidence; each should be used appropriately.
+
+-   A technically correct solution can still be a poor real-world decision if the model represents the wrong problem.
+
+## 6. Application to Prescriptive Analytics
+
+When a solver produces an answer that seems intuitively wrong, investigate four things:
+
+**Objective function:** Does it measure what you actually want to optimize?
+
+**Constraints:** Have you included all necessary restrictions? Are the inequality directions correct?
+
+**Interpretation:** Do the decision variables and assumptions match the real-world situation?
+
+**Problem formulation:** Have you understood the decision and its objectives well enough to formulate the model correctly?
+
+The solver optimizes the mathematical formulation you provide. It cannot independently determine whether that formulation captures the real-world problem appropriately.
+
+## Take-home message
+
+**Optimization finds the best solution to the model you give it—not necessarily the best solution to the real-world situation.**
+
+Systems thinking helps you understand and formulate the right problem. Quantitative modelling helps you analyse it. Their complementary use can lead to better-informed decisions.
+
+**Reference:** Michael Pidd (2004), “Complementarity in systems modelling,” in *Systems Modelling: Theory and Practice*.
