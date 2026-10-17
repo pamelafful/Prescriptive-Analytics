@@ -1,8 +1,60 @@
 ---
-title: "Prescriptive Analytics Assignment 1"
-author: "Pamela Affu"
-format: pdf
+title: ""
+author: ""
 editor: visual
+format:
+  pdf:
+    monofont: "Courier New"  
+    pdf-engine: lualatex
+    fig-pos: 'H'
+    include-in-header:
+      text: |
+        \usepackage{listings}
+    
+linestretch: 1.05
+documentclass: article
+include-in-header:
+  text: |
+    \usepackage{graphicx}
+
+include-before-body:
+  text: |
+    \begin{titlepage}
+    \centering
+
+    {\Large University of Cape Town\par}
+    \vspace{0.8cm}
+
+    \includegraphics[width=0.35\textwidth]{CopyOfUCTLogo.jpg}
+
+    \vspace{2cm}
+
+    {\Large  Prescriptive Analytics Assignment 1 \par}
+    
+    \vspace{1.5cm}
+
+    {\large Optimal Mobile Generator Distribution for Telecommunication Network\par}
+
+    \vspace{1.5cm}
+
+    {\large Pamela Afful\par}
+
+    \vspace{0.5cm}
+
+    {\large Student Number: AFFPAM001\par}
+
+    \vfill
+
+    {\large \today\par}
+
+    \end{titlepage}
+    
+execute: 
+  cache: true
+  warning: false
+  message: false
+  echo: false
+  enabled: true
 ---
 
 # Optimal Site Generator Distribution
@@ -19,10 +71,407 @@ Key Definitions:
 
 -   Site Availability: The percentage of time that a specific telecom site, including its radio equipment, power supplies, backhaul, and virtual or physical connection links, is fully operational and capable of processing traffic. (<https://medium.com/>@saeedfelegari/site-availability-in-telecom-metrics-architecture-and-the-real-requirements-behind-the-numbers-37cf574ba711.
 
-    -   A site is said to be fully available, 100% in a month , if it is available for all the available
+    -   This metric is measured as the percentage number of seconds a site is operational over the total number of seconds in a month, with 100%= full availability.
 
 EDA: Site Counts and Spatial Distributions
 
-# Section 1 : MLP Formulation
+# Section 1: Deterministic MLP Formulation
 
-The generator deployment problem lends itself to the set covering problem formulation. In this case, we would like to deploy the minimum number of sites (and the cost associated) subject to the constraint that the aggregate availability over the region is \>=95%.
+The generator deployment problem lends itself to the set covering problem formulation. In this case, we would like to deploy the minimum number of sites (and the associated cost) subject to the constraint that the aggregate availability over the region is \>=95%. Sites also neighbour each other such that their coverage may overlap in certain regions where sites are densely clustered.
+
+Assumptions:
+
+-   Each site can get only one generator
+
+-   Average site coverage= 30K radius
+
+-   Model for a Stage 1 load shedding schedule with at most 1 power outage per day.
+
+What I need: Coverage matrix to get the distances between sites.
+
+LP Formulation:\
+
+## Mathematical formulation
+
+### Sets and parameters
+
+Let $J$ be the set of candidate generator sites and $I$ the set of elementary demand cells obtained by overlaying the coverage polygons (or from a regular grid over the region of interest).
+
+$$
+a_{ij} =
+\begin{cases}
+1 & \text{if cell } i \in I \text{ lies within the coverage polygon of site } j \in J,\\
+0 & \text{otherwise,}
+\end{cases}
+$$
+
+where $c_j$ is the cost of placing a generator at site $j$ ($c_j = 1$ if the objective is simply the number of generators), $w_i$ is the weight of cell $i$ (area, or population/traffic if available), and $\alpha \in (0,1]$ is the minimum required fraction of weighted coverage.
+
+### Decision variables
+
+$$
+x_j =
+\begin{cases}
+1 & \text{if a generator is placed at site } j,\\
+0 & \text{otherwise,}
+\end{cases}
+\qquad
+y_i =
+\begin{cases}
+1 & \text{if cell } i \text{ is covered,}\\
+0 & \text{otherwise.}
+\end{cases}
+$$
+
+### Model A: minimum-cost partial set covering
+
+$$
+\begin{aligned}
+\min \quad & \sum_{j \in J} c_j \, x_j \\[4pt]
+\text{s.t.} \quad
+& y_i \le \sum_{j \in J} a_{ij}\, x_j && \forall\, i \in I, \\
+& \sum_{i \in I} w_i \, y_i \;\ge\; \alpha \sum_{i \in I} w_i, \\
+& x_j \in \{0,1\} && \forall\, j \in J, \\
+& y_i \in \{0,1\} && \forall\, i \in I.
+\end{aligned}
+$$
+
+The first constraint links coverage to placement: a cell can only be counted as covered if at least one selected site's polygon contains it. The second enforces the minimum weighted coverage target. Setting $\alpha = 1$ and dropping the $y_i$ variables recovers the classical set covering problem $\sum_{j} a_{ij} x_j \ge 1$ for all $i$.
+
+### Model B: maximal covering (budget- or count-constrained)
+
+$$
+\begin{aligned}
+\max \quad & \sum_{i \in I} w_i \, y_i \\[4pt]
+\text{s.t.} \quad
+& y_i \le \sum_{j \in J} a_{ij}\, x_j && \forall\, i \in I, \\
+& \sum_{j \in J} c_j \, x_j \le B, \\
+& x_j \in \{0,1\} && \forall\, j \in J, \\
+& y_i \in \{0,1\} && \forall\, i \in I,
+\end{aligned}
+$$
+
+where $B$ is the available budget. With $c_j = 1$, replace the budget constraint by $\sum_j x_j = p$ to place exactly $p$ generators.
+
+OR :\
+$$
+\begin{aligned}
+\min \quad & Z = \sum_{j \in J} g_j x_j \\[6pt]
+\text{subject to} \quad
+& \sum_{k \in K} w_k y_k
+\geq \alpha \sum_{k \in K} w_k \\[6pt]
+& y_k \leq \sum_{j \in J} C_{kj} x_j,
+&& \forall k \in K \\[6pt]
+& \sum_{j \in J} x_j \leq G \\[6pt]
+& x_j \in \{0,1\},
+&& \forall j \in J \\[4pt]
+& y_k \in \{0,1\},
+&& \forall k \in K
+\end{aligned}
+$$
+
+Notation
+
+ - (J): set of candidate generator sites.
+
+\- (K): set of geographical coverage cells.
+
+\- (g_j): cost of deploying a generator at site (j).
+
+\- (x_j): 1 if a generator is deployed at site (j), and 0 otherwise.
+
+\- (y_k): 1 if geographical cell (k) retains coverage during load shedding, and 0 otherwise.
+
+\- (C\_{kj}): 1 if site (j) can adequately cover cell (k), and 0 otherwise.
+
+\- (w_k): weight of cell (k), such as its area
+
+. - (\alpha): minimum required coverage proportion (e.g. 0.95). - (G): maximum number of available generators.
+
+# Section 2: Deterministic MOLP Formulation- Revenue and Site Rankings
+
+## Site importance and multi-objective extension
+
+### Additional parameters
+
+Let $R_i$ and $T_i$ denote the revenue and traffic of network site $i \in I$. Normalise each KPI to $[0,1]$:
+
+$$
+\tilde{R}_i = \frac{R_i - \min_k R_k}{\max_k R_k - \min_k R_k},
+\qquad
+\tilde{T}_i = \frac{T_i - \min_k T_k}{\max_k T_k - \min_k T_k}.
+$$
+
+The composite importance score of site $i$ is
+
+$$
+s_i = \theta\, \tilde{R}_i + (1-\theta)\, \tilde{T}_i,
+\qquad \theta \in [0,1],
+$$
+
+where $\theta$ sets the relative emphasis on revenue versus traffic. Alternatively, if only the ordinal rank $\rho_i \in \{1,\dots,N\}$ is used (1 = highest revenue), a rank-based weight is
+
+$$
+s_i = \frac{N - \rho_i + 1}{N}
+\qquad \text{or} \qquad
+s_i = \frac{1}{\rho_i}.
+$$
+
+The total importance of the network is $S = \sum_{i \in I} s_i$. Sites with $s_i$ in the top tier are collected in the set $I^{\text{top}} \subseteq I$ (for example, the top 10% by revenue rank).
+
+### Model C: weighted-sum objective
+
+Using the same decision variables $x_j$ (generator placed at site $j$) and $y_i$ (site $i$ is covered) as before, let $C = \sum_{j \in J} c_j$ be the cost of deploying at every candidate site (used for scaling). Then
+
+$$
+\begin{aligned}
+\min \quad & (1-\lambda)\,\frac{1}{C}\sum_{j \in J} c_j\, x_j
+\;-\; \lambda\,\frac{1}{S}\sum_{i \in I} s_i\, y_i \\[4pt]
+\text{s.t.} \quad
+& y_i \le \sum_{j \in J} a_{ij}\, x_j && \forall\, i \in I, \\
+& \sum_{i \in I} w_i\, y_i \;\ge\; \alpha \sum_{i \in I} w_i, \\
+& y_i = 1 && \forall\, i \in I^{\text{top}} \quad \text{(optional)}, \\
+& x_j \in \{0,1\}, \; y_i \in \{0,1\},
+\end{aligned}
+$$
+
+where $\lambda \in [0,1]$ trades off cost against protected importance. Both terms are scaled to $[0,1]$ so that $\lambda$ has a meaningful interpretation. At $\lambda = 0$ the model reduces to Model A.
+
+### Model D: $\varepsilon$-constraint (cost minimisation with an importance floor)
+
+$$
+\begin{aligned}
+\min \quad & \sum_{j \in J} c_j\, x_j \\[4pt]
+\text{s.t.} \quad
+& y_i \le \sum_{j \in J} a_{ij}\, x_j && \forall\, i \in I, \\
+& \sum_{i \in I} w_i\, y_i \;\ge\; \alpha \sum_{i \in I} w_i, \\
+& \sum_{i \in I} s_i\, y_i \;\ge\; \beta\, S, \\
+& x_j \in \{0,1\}, \; y_i \in \{0,1\},
+\end{aligned}
+$$
+
+where $\beta \in [0,1]$ is the minimum fraction of total weighted revenue/traffic that must be protected. This is equivalent to Model C but gives the decision-maker a directly interpretable target. Varying $\beta$ (and $\alpha$) traces the Pareto frontier of cost against protected importance.
+
+### Model E: lexicographic (priority-ordered) objectives
+
+Stage 1 solves Model A to obtain the minimum cost $z_1^*$. Stage 2 fixes cost at (or within a tolerance $\delta$ of) the optimum and maximises protected importance:
+
+$$
+\begin{aligned}
+\max \quad & \sum_{i \in I} s_i\, y_i \\[4pt]
+\text{s.t.} \quad
+& \sum_{j \in J} c_j\, x_j \le (1+\delta)\, z_1^*, \\
+& \text{all constraints of Model A.}
+\end{aligned}
+$$
+
+This guarantees that, among all cost-minimal (or near cost-minimal) deployments, the one protecting the most important sites is chosen.
+
+### Optional: favouring important generator locations
+
+If you also want the *chosen generator sites themselves* to be high-ranked, add a term in the site-selection variables, with $s_j$ the importance score of candidate site $j$:
+
+$$
+\max \quad \sum_{i \in I} s_i\, y_i \;+\; \gamma \sum_{j \in J} s_j\, x_j,
+\qquad \gamma \ge 0 .
+$$
+
+## Option F
+
+$$
+\begin{aligned}
+\max \quad Z ={}&
+\lambda_R \sum_{j \in J} \widetilde{r}_j x_j
++ \lambda_S \sum_{j \in J} s_j x_j
+- \lambda_C \sum_{j \in J} \widetilde{g}_j x_j
+\\[8pt]
+\text{subject to} \quad
+& \sum_{k \in K} w_k y_k
+\geq \alpha \sum_{k \in K} w_k
+\\[6pt]
+& y_k \leq \sum_{j \in J} C_{kj} x_j,
+&& \forall k \in K
+\\[6pt]
+& \sum_{j \in J} x_j \leq G
+\\[6pt]
+& x_j \in \{0,1\},
+&& \forall j \in J
+\\[4pt]
+& y_k \in \{0,1\},
+&& \forall k \in K
+\end{aligned}
+$$
+
+where \
+
+-   $J$: Set of candidate sites where generators could be deployed.
+-   $K$: Set of geographic cells used to represent the coverage area.
+-   $x_j \in \{0,1\}$: Binary decision variable equal to 1 if a generator is deployed at site $j$, and 0 otherwise.
+-   $y_k \in \{0,1\}$: Binary indicator equal to 1 if geographic cell $k$ retains adequate network coverage during load shedding, and 0 otherwise.
+-   $C_{kj} \in \{0,1\}$: Coverage indicator equal to 1 if site $j$, when operational, provides adequate coverage to cell $k$, and 0 otherwise.
+-   $w_k$: Area weight of geographic cell $k$.
+-   $\alpha$: Minimum required proportion of the total geographic area that must retain adequate coverage.
+-   $G$: Maximum number of generators available for deployment.
+-   $\widetilde{r}_j$: Normalised revenue associated with site $j$.
+-   $s_j$: Normalised importance score for site $j$, derived from its business ranking.
+-   $\widetilde{g}_j$: Normalised generator deployment cost at site $j$.
+-   $\lambda_R, \lambda_S, \lambda_C \geq 0$: Objective weights representing the relative importance of revenue, site ranking, and generator cost, respectively.
+
+# Section 3: Simulated Annealing Formulation\*
+
+Let the candidate solution be represented by a binary vector:
+
+### Simulated Annealing Formulation
+
+Let the candidate solution be represented by a binary vector:
+
+$$
+\mathbf{x} = (x_1, x_2, \ldots, x_n), \qquad x_j \in \{0,1\}, \quad j = 1,\ldots,n
+$$
+
+where (x_j = 1) indicates that a generator is deployed at site (j), and (x_j = 0) otherwise.
+
+The initial solution is denoted by\
+\
+$$
+\mathbf{x^{0}} = (x_1, x_2, \ldots, x_n)
+$$
+
+At each iteration (t), a neighbouring solutio is generated by modifying the current solution. For example,
+
+$$
+\mathbf{x}^{(t)} = (1,0,0,1,1)
+$$
+
+could generate the neighbouring solution
+
+$$
+\mathbf{x}' = (0,0,0,1,1)
+$$
+
+The objective function is evaluated at the current and neighbouring solutions. For the initial set-covering problem, the objective is to minimise the total number of generators deployed:
+
+$$
+\min_{\mathbf{x}} \quad f(\mathbf{x}) = \sum_{j=1}^{n} x_j
+$$
+
+The simulated annealing algorithm uses the change in objective value,
+
+$$
+\Delta f = f(\mathbf{x}') - f\left(\mathbf{x}^{(t)}\right)
+$$
+
+to determine whether the neighbouring solution should be accepted, with the acceptance decision also depending on the current temperature.
+
+# Discretizing the Problem: Stochastic Load Shedding Scheduling
+
+What is different:\
+One of my key assumptions initial LP formulation is that the load shedding schedule is deterministic and that all sites are experiance power outages at the same time. In reality this is not the case.
+
+There is a stochastic element to the prevalence of the power outages and as such not all sites will experiance interrupted power at the same time and require generators. In light of this I want to model the problem as a discrete event and run simulations based on the appropriate statistical distributions of the loadshedding event.
+
+Key Assumptions:
+
+-   The loadshedding stage for a given day is stochastic and as such follows an appropriate statistical distribution, however, the actual load shedding times that come as a result of that announced stage are deterministic and follow a set schedule.
+
+-   Only a percetange of sites are affected by load shedding at the same time. The percentage at any given schedule is itself either stochatistic or determisitic (still to be decided.
+
+### Stochastic Load shedding stage  use ditribution of stage frequencies
+
+Stage announcements occur at random epochs. At the $n$-th announcement, at time $T_n$, $$
+\sigma(T_n^{+}) = l \quad \text{with probability } p_{\sigma(T_n^{-})\, l},
+\qquad
+T_{n+1} - T_n \sim F_{S}(\,\cdot \mid \sigma(T_n^{+})),
+$$ where $P = [p_{kl}]$ is a stage transition matrix and $F_S(\cdot \mid k)$ is the sojourn-time distribution of stage $k$ (the time until the next announcement), both estimated from historical stage logs. The special case of one announcement per day at a fixed time of day, with $\sigma_d \overset{\text{i.i.d.}}{\sim} \pi$, is obtained by setting $F_S = \delta_{24\text{ h}}$ and $p_{kl} = \pi_l$.
+
+### Deterministic timetable
+
+Given the stage $k$ and the current position in the rotation cycle, the timetable defines, for each block $g$, a set of scheduled off-intervals $$
+\mathcal{W}_g^{k}(\delta) = \big\{ [\underline{w}_{g,m}^{k},\, \overline{w}_{g,m}^{k}) \big\}_{m},
+$$ within cycle day $\delta$. A stage change at time $T_n$ cancels all pending timetable events and reschedules the intervals of the new stage that begin at or after $T_n$. If $T_n$ falls inside an interval of the new stage in which block $g$ is already scheduled off, block $g$ goes off at $T_n$. An optional switching delay $\epsilon \sim F_\epsilon$ (default $\epsilon = 0$) can be added to each switch-on or switch-off, which gives a controlled way to introduce schedule deviation later.
+
+### Event types and transition rules
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\hline
+\textbf{Event} & \textbf{Trigger} & \textbf{State change and scheduled follow-ups} \\
+\hline
+$E_1$: stage announcement & time $T_n$ & draw new stage; cancel and reschedule $E_2,E_3$ \\
+$E_2$: block switch-off & timetable & $u_g \leftarrow 1$; sites on battery; schedule $E_4$ \\
+$E_3$: block switch-on & timetable & $u_g \leftarrow 0$; sites on grid; begin battery recharge \\
+$E_4$: battery depletion at $i$ & $b_i$ reaches $b_i^{\min}$ & site on generator if available, else down \\
+$E_5$: generator fuel exhaustion & $f_j$ reaches 0 & reassign sites; site down if none available \\
+$E_6$: end of horizon & $t = H$ & stop and record statistics \\
+\hline
+\end{tabular}
+\end{center}
+
+### Continuous state evolution between events
+
+Between consecutive events the energy states evolve linearly, so no time-stepping is needed. For a site on battery with load $l_i$, $$
+b_i(t) = b_i(t_0) - l_i\,(t - t_0), \qquad
+t^{\text{depl}}_i = t_0 + \frac{b_i(t_0) - b_i^{\min}}{l_i},
+$$ and the depletion event $E_4$ is scheduled at $t^{\text{depl}}_i$. For generator $j$ serving the set $A_j(t)$ of sites, $$
+f_j(t) = f_j(t_0) - \Big(\sum_{i \in A_j} l_i\Big)(t - t_0).
+$$ After grid restoration a battery recharges at rate $r_i$ up to $B_i$.
+
+### Generator allocation rule
+
+When site $i$ needs backup (battery depleted, or by policy at block switch-off) it is assigned to a generator in $$
+J_i(t) = \Big\{ j \in J^x : a_{ij} = 1,\;
+f_j(t) > 0,\; \sum_{i' \in A_j(t)} l_{i'} + l_i \le K_j \Big\},
+$$ using a priority rule, for example highest importance $s_i$ first and ties broken by nearest generator. If $J_i(t) = \emptyset$ the site is down (unserved) until power or capacity becomes available.
+
+### Event-list algorithm
+
+\begin{enumerate}
+\item Initialise $t \leftarrow 0$, $\mathbf{S}(0)$, and the event list $\mathcal{L}$
+with the first stage announcement $E_1$ at $T_1$ and the timetable events
+for the initial stage.
+\item While $\mathcal{L} \neq \emptyset$:
+  \begin{enumerate}
+  \item pop the event $e^{*} = \arg\min_{e \in \mathcal{L}} \tau_e$ and set $t \leftarrow \tau_{e^*}$;
+  \item update accumulators over $[t_{\text{prev}}, t]$ using the state held constant
+        during the interval (see below);
+  \item apply the transition rule of $e^{*}$, reallocate generators, and update $\mathbf{S}$;
+  \item schedule new events (depletion, exhaustion, next announcement, timetable
+        events) and cancel events invalidated by the state change.
+  \end{enumerate}
+\item Stop at $t = H$ and return the performance measures.
+\end{enumerate}
+
+### Performance measures (per replication $r$)
+
+Let $\mathbb{1}\{\mu_i(t) = \text{down}\}$ indicate that site $i$ is unserved at time $t$. Then \begin{align*}
+\text{Downtime of site } i:\quad & D_i^{(r)} = \int_0^H \mathbb{1}\{\mu_i(t) = \text{down}\}\,dt,\\
+\text{Importance-weighted unserved exposure:}\quad & L^{(r)} = \sum_{i \in I} s_i\, D_i^{(r)},\\
+\text{Revenue lost:}\quad & \Lambda^{(r)} = \sum_{i \in I} R_i\, D_i^{(r)},\\
+\text{Generator utilisation:}\quad & \rho_j^{(r)} = \frac{1}{H}\int_0^H \mathbb{1}\{A_j(t) \ne \emptyset\}\,dt,\\
+\text{Fuel used:}\quad & \Xi_j^{(r)} = F_j - f_j(H) + \text{refuel quantities}.
+\end{align*}
+
+### Replications and output analysis
+
+Run $N$ independent replications $r = 1,\dots,N$ with independent random-number streams. For any measure $Y^{(r)}$, $$
+\bar{Y} = \frac{1}{N}\sum_{r=1}^{N} Y^{(r)},
+\qquad
+\bar{Y} \pm t_{N-1,\,1-\gamma/2}\,\frac{S_Y}{\sqrt{N}},
+\qquad
+S_Y^2 = \frac{1}{N-1}\sum_{r=1}^{N}\big(Y^{(r)} - \bar{Y}\big)^2 .
+$$ The number of replications is chosen so that the relative half-width is at most a target $\varepsilon_{\text{rel}}$: $$
+N \;\ge\; \left(\frac{t_{N-1,\,1-\gamma/2}\, S_Y}{\varepsilon_{\text{rel}}\, \bar{Y}}\right)^{2}.
+$$ When comparing alternative placements $x$ and $x'$, use common random numbers (the same stage paths in both runs) and a paired confidence interval on $Y^{(r)}(x) - Y^{(r)}(x')$.
+
+### Coupling the simulation with the optimisation
+
+\begin{enumerate}
+\item \textbf{Scenario generation:} use the simulated outage histories
+$o_{i t}^{(r)}$ as the scenario set $\Omega$ in the SAA model.
+\item \textbf{Solve} for $x^{*}$.
+\item \textbf{Evaluate:} re-run the DES with $x^{*}$ fixed, including battery,
+fuel and allocation dynamics, on fresh replications. Report $\bar L$, $\bar\Lambda$ and
+tail quantiles, and compare with the optimisation's predicted values.
+\end{enumerate}
+
+The gap between optimised and simulated performance measures quantifies the effect of the dynamics omitted from the optimisation model.
