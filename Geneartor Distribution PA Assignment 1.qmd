@@ -1,0 +1,28 @@
+---
+title: "Prescriptive Analytics Assignment 1"
+author: "Pamela Affu"
+format: pdf
+editor: visual
+---
+
+# Optimal Site Generator Distribution
+
+Data Sources: Vodacom data, localized for the Vodacom KZN Region
+
+## Problem Statement \* will add more
+
+Load shedding and insecure power supply put a strain on network servicing sites, affecting coverage and availability of those sites with material impact on site revenue generation from user traffic flows. Running generators at sites impacted by power disruptions offers the immediate solution to ensuring sites continue to run during interrupted power supply; however, there is a limited supply of generators that can be deployed to sites, as well as the cost associated with the deployment and running of the generators. Vodacom would like to develop a strategy for the optimal distribution of generators to important sites with the minimum cost attached whilst ensuring coverage needs and availability are maintained.
+
+Key Definitions:
+
+-   Atoll Site ID: Identifier for a physical structure that houses antennas, transmitters, receivers, and networking hardware needed to transmit and receive voice, data, and internet signals. These have a set coverage shape that defines the span of the site's coverage over a physical space (word this better and added refrence)
+
+-   Site Availability: The percentage of time that a specific telecom site, including its radio equipment, power supplies, backhaul, and virtual or physical connection links, is fully operational and capable of processing traffic. (<https://medium.com/>@saeedfelegari/site-availability-in-telecom-metrics-architecture-and-the-real-requirements-behind-the-numbers-37cf574ba711.
+
+    -   A site is said to be fully available, 100% in a month , if it is available for all the available
+
+EDA: Site Counts and Spatial Distributions
+
+# Section 1 : MLP Formulation
+
+The generator deployment problem lends itself to the set covering problem formulation. In this case, we would like to deploy the minimum number of sites (and the cost associated) subject to the constraint that the aggregate availability over the region is \>=95%.
