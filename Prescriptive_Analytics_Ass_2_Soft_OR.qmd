@@ -1,0 +1,90 @@
+---
+title: ""
+author: ""
+editor: visual
+format:
+  pdf:
+    monofont: "Courier New"  
+    pdf-engine: lualatex
+    fig-pos: 'H'
+    include-in-header:
+      text: |
+        \usepackage{listings}
+    
+linestretch: 1.05
+documentclass: article
+include-in-header:
+  text: |
+    \usepackage{graphicx}
+
+include-before-body:
+  text: |
+    \begin{titlepage}
+    \centering
+
+    {\Large University of Cape Town\par}
+    \vspace{0.8cm}
+
+    \includegraphics[width=0.35\textwidth]{CopyOfUCTLogo.jpg}
+
+    \vspace{2cm}
+
+    {\Large  Prescriptive Analytics Assignment \par}
+    
+    \vspace{1.5cm}
+
+    {\large Soft Systems Methodology and Cognitive Mapping\par}
+
+    \vspace{1.5cm}
+
+    {\large Pamela Afful\par}
+
+    \vspace{0.5cm}
+
+    {\large Student Number: AFFPAM001\par}
+
+    \vfill
+
+    {\large \today\par}
+
+    \end{titlepage}
+    
+execute: 
+  cache: true
+  warning: false
+  message: false
+  echo: false
+  enabled: true
+---
+
+# The Messy Problem
+
+A telecommunications company must decide which network sites to upgrade over the next five years in order to remain competitive in a fast-changing and highly contested market. These decisions must balance the coverage needs of customers across different socio-economic strata, including a commitment to maintaining quality coverage in rural and remote communities, even where these are not the most revenue-generating. They are further constrained by legal and regulatory conditions governing the spectrum available to the company, intended to ensure fair competition, and by how that spectrum is distributed across sites already in the network.
+
+At the same time, the company has set a strategic ambition to transform from a traditional telecoms operator into a leader at the forefront of industry innovation, in line with increasing shareholder value. This has driven a growing push to adopt AI across its operations and business strategy, requiring significant capital expenditure that competes with network investment. The push has also generated unease within the workforce, where many employees fear that AI will make their roles redundant and feel they have not been brought along or shown a place in the company’s next strategic direction. Additionally, the company’s leadership culture relies heavily on positional power and top-down decision-making, which slows feedback loops and limits the extent to which employee concerns and frontline knowledge can inform strategic choices.
+
+#### Key Conflicts: 
+
+-   Competitive Edge vs Social Responsibility
+
+-   Technology Adoption vs Employee buy-in
+
+-   Regulatory requirements vs Shareholder Value
+
+# Problem Expression
+
+#### Root Definition
+
+A company-owned system, operated by network planners, engineers, and executives, that prioritises and upgrades network sites and adopts AI within regulatory spectrum limits, in order to transform an uneven network and an uncertain strategic direction into a network that delivers quality service to urban and rural subscribers alike, so that the company remains competitive and viable over the next five years.
+
+-   **Customers**: Subscribers, Shareholders
+
+-   **Actors**: Network Planners, Engineers, and C-Suite Executives
+
+-   **Transformation:** Improved network service through the upgrade of existing sites and expanded coverage for remote areas
+
+-   **Worldview (from executives' perspectives):** quality coverage and innovation are both necessary to remain viable
+
+-    **Owners**: Company C Suite, set the business strategy and cascade goals to different parts of the company. Decide on the allocation of strategic investments and expenditure that the company adopts. Have a fiduciary obligation to shareholders.
+
+-   **Environmental constraints:** spectrum regulation, capital limits, competitors, technology change

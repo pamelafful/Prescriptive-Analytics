@@ -172,7 +172,7 @@ $$
 
 Notation
 
- - (J): set of candidate generator sites.
+-   (J): set of candidate generator sites.
 
 \- (K): set of geographical coverage cells.
 
@@ -302,7 +302,7 @@ $$
 \end{aligned}
 $$
 
-where \
+where\
 
 -   $J$: Set of candidate sites where generators could be deployed.
 -   $K$: Set of geographic cells used to represent the coverage area.
@@ -376,7 +376,7 @@ Key Assumptions:
 
 -   Only a percetange of sites are affected by load shedding at the same time. The percentage at any given schedule is itself either stochatistic or determisitic (still to be decided.
 
-### Stochastic Load shedding stage  use ditribution of stage frequencies
+### Stochastic Load shedding stage use ditribution of stage frequencies
 
 Stage announcements occur at random epochs. At the $n$-th announcement, at time $T_n$, $$
 \sigma(T_n^{+}) = l \quad \text{with probability } p_{\sigma(T_n^{-})\, l},
