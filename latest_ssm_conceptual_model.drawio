@@ -1,0 +1,116 @@
+<mxfile host="app.diagrams.net" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36">
+  <diagram id="e7e014a7-5840-1c2e-5031-d8a46d1fe8dd" name="Page-1">
+    <mxGraphModel dx="1295" dy="646" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="826" background="none" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="RGqf175bft2HaRk7UnsG-55" edge="1" parent="1" source="3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=1;exitDx=0;exitDy=0;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1160" y="750" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3" parent="1" style="swimlane;whiteSpace=wrap;startSize=70;fontSize=18;" value="Company Five Year Strategy" vertex="1">
+          <mxGeometry height="753" width="1100" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="13" parent="3" style="ellipse;shape=startState;fillColor=#000000;strokeColor=#ff0000;" value="" vertex="1">
+          <mxGeometry height="30" width="30" x="60" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="14" edge="1" parent="3" source="13" style="edgeStyle=elbowEdgeStyle;elbow=horizontal;verticalAlign=bottom;endArrow=open;endSize=8;strokeColor=#FF0000;endFill=1;rounded=0" target="15" value="">
+          <mxGeometry x="40" y="20" as="geometry">
+            <mxPoint x="55" y="90" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="RGqf175bft2HaRk7UnsG-61" edge="1" parent="3" source="15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="179.4" y="258.3" />
+              <mxPoint x="160" y="258.3" />
+              <mxPoint x="160" y="280" />
+            </Array>
+            <mxPoint x="210" y="280" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="15" parent="3" style="" value="Ensure fair and equitable use of  acquired &#xa;expanded spectrum from regulator" vertex="1">
+          <mxGeometry height="132.5" width="228.75" x="65" y="104" as="geometry" />
+        </mxCell>
+        <mxCell id="RGqf175bft2HaRk7UnsG-43" edge="1" parent="3" source="16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0;exitDx=0;exitDy=0;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="550" y="167" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="RGqf175bft2HaRk7UnsG-50" edge="1" parent="3" source="16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;" target="RGqf175bft2HaRk7UnsG-49" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="16" parent="3" style="" value="Ensure Network Expands to cater &#xa;for growing customer demands -&#xa;across socioeconomic landscape" vertex="1">
+          <mxGeometry height="132.5" width="201.25" x="358.75" y="174" as="geometry" />
+        </mxCell>
+        <mxCell id="17" edge="1" parent="3" source="15" style="endArrow=open;strokeColor=#FF0000;endFill=1;rounded=0" target="16" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RGqf175bft2HaRk7UnsG-48" edge="1" parent="3" source="18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=1;exitDx=0;exitDy=0;defaultLabelBackgroundColor=page;" target="RGqf175bft2HaRk7UnsG-44">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RGqf175bft2HaRk7UnsG-57" edge="1" parent="3" source="18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;" target="RGqf175bft2HaRk7UnsG-56" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RGqf175bft2HaRk7UnsG-60" edge="1" parent="3" source="18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;defaultLabelBackgroundColor=page;" target="16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="18" parent="3" style="" value="Grow technology capabilities, market share,&#xa;and grow company value" vertex="1">
+          <mxGeometry height="97" width="250" x="374" y="384" as="geometry" />
+        </mxCell>
+        <mxCell id="34" parent="3" style="whiteSpace=wrap;strokeColor=#FF0000;fillColor=#FF0000" value="" vertex="1">
+          <mxGeometry height="45" width="5" x="245" y="395" as="geometry" />
+        </mxCell>
+        <mxCell id="RGqf175bft2HaRk7UnsG-45" edge="1" parent="3" source="RGqf175bft2HaRk7UnsG-41" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;" target="RGqf175bft2HaRk7UnsG-44" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RGqf175bft2HaRk7UnsG-53" edge="1" parent="3" source="RGqf175bft2HaRk7UnsG-41" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;" target="RGqf175bft2HaRk7UnsG-52" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RGqf175bft2HaRk7UnsG-41" parent="3" style="" value="AI Adoption (competing with network CAPEX &#xa;and OPEX)" vertex="1">
+          <mxGeometry height="90" width="260" x="358.75" y="544" as="geometry" />
+        </mxCell>
+        <mxCell id="RGqf175bft2HaRk7UnsG-44" parent="3" style="ellipse;whiteSpace=wrap;html=1;shapeInside=1;" value="Employee Upskilling and development programs" vertex="1">
+          <mxGeometry height="132.5" width="130" x="720" y="417.5" as="geometry" />
+        </mxCell>
+        <mxCell id="RGqf175bft2HaRk7UnsG-51" edge="1" parent="3" source="RGqf175bft2HaRk7UnsG-49" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.25;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="RGqf175bft2HaRk7UnsG-41">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="710" y="495" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="RGqf175bft2HaRk7UnsG-58" edge="1" parent="3" source="RGqf175bft2HaRk7UnsG-49" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;" target="RGqf175bft2HaRk7UnsG-54" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RGqf175bft2HaRk7UnsG-49" parent="3" style="whiteSpace=wrap;html=1;" value="Internal Cross Functional (specifically between Finance and Network Engineering) working groups to better understand network needs against CAPEX constrains&amp;nbsp;" vertex="1">
+          <mxGeometry height="132.5" width="215" x="646" y="80.5" as="geometry" />
+        </mxCell>
+        <mxCell id="RGqf175bft2HaRk7UnsG-52" parent="3" style="whiteSpace=wrap;html=1;" value="Develop governance processes to ensure client data is protected&amp;nbsp; against unethical AI use, ensure these are documented and followed&amp;nbsp;" vertex="1">
+          <mxGeometry height="105" width="178.75" x="30" y="450" as="geometry" />
+        </mxCell>
+        <mxCell id="RGqf175bft2HaRk7UnsG-59" edge="1" parent="3" source="RGqf175bft2HaRk7UnsG-56" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="RGqf175bft2HaRk7UnsG-44">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RGqf175bft2HaRk7UnsG-56" parent="3" style="whiteSpace=wrap;html=1;" value="Create environment of open communication, transparency and stakeholder buy-in via townhalls and executive/ employee enagement" vertex="1">
+          <mxGeometry height="132.5" width="215" x="785" y="244" as="geometry" />
+        </mxCell>
+        <mxCell id="RGqf175bft2HaRk7UnsG-54" parent="3" style="" value="Network Expansion" vertex="1">
+          <mxGeometry height="60" width="142.5" x="890" y="126.5" as="geometry" />
+        </mxCell>
+        <mxCell id="RGqf175bft2HaRk7UnsG-62" parent="3" style="whiteSpace=wrap;html=1;" value="Regular reporting on spatial spectrum usage and allocation to regulatory bodies" vertex="1">
+          <mxGeometry height="105" width="178.75" x="65" y="306.5" as="geometry" />
+        </mxCell>
+        <mxCell id="RGqf175bft2HaRk7UnsG-63" edge="1" parent="3" source="15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;innerLoopWaypoints=1;exitX=1;exitY=0;exitDx=0;exitDy=0;defaultLabelBackgroundColor=page;" target="15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="20" edge="1" parent="1" style="endArrow=open;strokeColor=#FF0000;endFill=1;rounded=0" target="18" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="190" y="474.1923076923076" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
