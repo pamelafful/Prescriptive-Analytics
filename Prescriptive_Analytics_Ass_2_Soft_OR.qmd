@@ -76,21 +76,25 @@ At the same time, the company has set a strategic ambition to transform from a t
 
 # Problem Expression
 
-#### Root Definition
+#### System Root Definition
 
-A company-owned system, operated by network planners, engineers, and executives, that prioritises and upgrades network sites and adopts AI within regulatory spectrum limits, in order to transform an uneven network and an uncertain strategic direction into a network that delivers quality service to urban and rural subscribers alike, so that the company remains competitive and viable over the next five years.
+A company-owned system, envisioned executives, that prioritizes technology expansion and AI adoption to grow company value, ensure that the company remains competitive and viable over the next five years inline with fiduciary obligations to shareholders.\*comeback
 
--   **Customers**: Subscribers, Shareholders
+Customers: Subscribers, Shareholders
 
--   **Actors**: Network Planners, Engineers, and C-Suite Executives
+Actors: Network Planners, Engineers, and C-Suite Executives
 
--   **Transformation:** Improved network service through the upgrade of existing sites and expanded coverage for remote areas
+Transformation: Improved network service through the upgrade of existing sites and expanded coverage for remote areas
 
--   **Worldview (from executives' perspectives):** quality coverage and innovation are both necessary to remain viable
+Worldview (from executives' perspectives): quality coverage and innovation are both necessary to remain viable
 
--   **Owners**: Company C Suite, set the business strategy and cascade goals to different parts of the company. Decide on the allocation of strategic investments and expenditure that the company adopts. Have a fiduciary obligation to shareholders.
+Owners: Company C Suite, set the business strategy and cascade goals to different parts of the company. Decide on the allocation of strategic investments and expenditure that the company adopts. Have a fiduciary obligation to shareholders.
 
--   **Environmental constraints:** spectrum regulation, capital limits, competitors, technology change
+Environmental constraints: spectrum regulation, capital limits, competitors, technology change
+
+#### Subsystem Root Definition (Network Engineers and Planners) \* comeback
+
+A technical system owned by by network planners, engineers that priorities and upgrades network sites to ensure growing demand is met and deliver excellent service to network customers. within regulatory spectrum limits, in order to transform an uneven network and an uncertain strategic direction into a network that delivers quality service to urban and rural subscribers alike,
 
 **Rich Picture** **the problem**
 
