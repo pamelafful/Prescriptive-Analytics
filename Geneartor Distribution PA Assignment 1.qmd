@@ -302,7 +302,7 @@ rhs_2=matrix(beta*total_subs,ncol=1,nrow=1)
 obj_vec=rep(1,nrow(cpt_site_ranges_subs_gdf)) # xi
 
 
-constraint_mat=rbind(constaint_1,constraint_2)
+constraint_mat_lp=rbind(constaint_1,constraint_2)
 
 my_types = rep("B",length(obj_vec)) # enforces boolean output!
 rhs_=rbind(rhs_1,rhs_2)
@@ -311,7 +311,7 @@ dir_vec=c(rep('<=',dim(constraint_1)[1]),'>=')
 # Enter into solver
 
 
-lp_soln=Rglpk_solve_LP(obj = obj_vec, mat =constraint_mat , types = my_types,dir = dir_vec, rhs = rhs_, max = FALSE) # minimization problm
+lp_soln=Rglpk_solve_LP(obj = obj_vec, mat =constraint_mat_lp , types = my_types,dir = dir_vec, rhs = rhs_, max = FALSE) # minimization problm
 
 
 # Yay!
@@ -347,140 +347,254 @@ leaflet(cpt_site_ranges_subs_gdf) |>
   addLegend(
     position = "bottomright",
     colors = c("blue", "white"),
-    labels = c("Gets generator (1)", "No generator (0)"),
+    labels = c("Gets generator ", "No generator "),
     title = "Generator Allocation",
     opacity = 0.9
   )
 ```
 
-# Section 2: Deterministic MOLP Formulation- Revenue and Site Rankings
+# Section 2: Deterministic MOLP Formulation- Incorporating Revenue-led Site Importance 
 
-## Site importance and multi-objective extension
+Naturally, the choice to deploy a generator at a site is not only determined by cost alone, but by the relative importance of the site in terms of its traffic flows and revenue. Thus an additional objective to the problem would be to minimize (or at least preserve) aggregate peak traffic flow loss across sites and thus minimize (at least preserve) peak revenue loss at these sites.
+
+For simplicity's sake (and available data), we assume the following, in addition to the key assumptions in Section 1:
+
+-   Revenue at a site,$Rev_i$, is a monotonically increasing function of traffic. Thus, a relatively high-revenue site implies that a high-traffic site.
+
+-   As such, only the revenue objective is added to the initial generator minimization problem. We aim to minimize the loss of revenue at these sites
+
+-   The average monthly site revenues are generated at peak times across sites. The sum of these across sites would ideally be preserved or maximised.
+
+-   **Revenue follows the subscriber:** The traffic/revenue that would be ordinarily attributed to a site before loadshedding, can be "absorbed" into neighboring sites by virtue of the subscribers still being able to access neigbouring sites that have generators as assumed in Section 1.
+
+-   Site rankings are derived from the normalized revenue of each site. Thus the goal would be minimize the sum of ranks(?)
+
+-   We initially assume that revenue preservation and generator cost minimization are weighted equally: $w1=w2=0.5$
 
 ### Additional parameters
 
-Let $R_i$ and $T_i$ denote the revenue and traffic of network site $i \in I$. Normalise each KPI to $[0,1]$:
+Let $R_i$ denote the revenue of network site $i \in I$. Normalise each KPI to $[0,1]$:
 
 $$
-\tilde{R}_i = \frac{R_i - \min_k R_k}{\max_k R_k - \min_k R_k},
+\tilde{Rev}_i = \frac{Rev_i - \min_k Rev_k}{\max_k Rev_k - \min_k Rev_k},
 \qquad
-\tilde{T}_i = \frac{T_i - \min_k T_k}{\max_k T_k - \min_k T_k}.
 $$
 
 The composite importance score of site $i$ is
 
 $$
-s_i = \theta\, \tilde{R}_i + (1-\theta)\, \tilde{T}_i,
-\qquad \theta \in [0,1],
+s_i = rank(R_{i})\
+st.\max(s_i)= \sum(x_i) 
 $$
-
-where $\theta$ sets the relative emphasis on revenue versus traffic. Alternatively, if only the ordinal rank $\rho_i \in \{1,\dots,N\}$ is used (1 = highest revenue), a rank-based weight is
-
-$$
-s_i = \frac{N - \rho_i + 1}{N}
-\qquad \text{or} \qquad
-s_i = \frac{1}{\rho_i}.
-$$
-
-The total importance of the network is $S = \sum_{i \in I} s_i$. Sites with $s_i$ in the top tier are collected in the set $I^{\text{top}} \subseteq I$ (for example, the top 10% by revenue rank).
-
-### Model C: weighted-sum objective
-
-Using the same decision variables $x_j$ (generator placed at site $j$) and $y_i$ (site $i$ is covered) as before, let $C = \sum_{j \in J} c_j$ be the cost of deploying at every candidate site (used for scaling). Then
 
 $$
 \begin{aligned}
-\min \quad & (1-\lambda)\,\frac{1}{C}\sum_{j \in J} c_j\, x_j
-\;-\; \lambda\,\frac{1}{S}\sum_{i \in I} s_i\, y_i \\[4pt]
-\text{s.t.} \quad
-& y_i \le \sum_{j \in J} a_{ij}\, x_j && \forall\, i \in I, \\
-& \sum_{i \in I} w_i\, y_i \;\ge\; \alpha \sum_{i \in I} w_i, \\
-& y_i = 1 && \forall\, i \in I^{\text{top}} \quad \text{(optional)}, \\
-& x_j \in \{0,1\}, \; y_i \in \{0,1\},
+r_i &: \text{average monthly peak revenue at site } i \\
+\rho_i &= r_i \Big/ \textstyle\sum_{k \in I} r_k : \text{normalized revenue (importance weight)} \\
+G &: \text{target (budget) number of generators} \\
+\gamma &: \text{target fraction of total peak revenue preserved} \\
+\omega_1, \omega_2 &: \text{goal weights}, \; \omega_1 + \omega_2 = 1 \\
+d_G^{+} &\ge 0 : \text{generators deployed above target } G \\
+d_r^{-} &\ge 0 : \text{shortfall of preserved revenue below target } \gamma \textstyle\sum_i r_i
 \end{aligned}
 $$
 
-where $\lambda \in [0,1]$ trades off cost against protected importance. Both terms are scaled to $[0,1]$ so that $\lambda$ has a meaningful interpretation. At $\lambda = 0$ the model reduces to Model A.
-
-### Model D: $\varepsilon$-constraint (cost minimisation with an importance floor)
+#### Weighted Archimedian Formulation 
 
 $$
-\begin{aligned}
-\min \quad & \sum_{j \in J} c_j\, x_j \\[4pt]
-\text{s.t.} \quad
-& y_i \le \sum_{j \in J} a_{ij}\, x_j && \forall\, i \in I, \\
-& \sum_{i \in I} w_i\, y_i \;\ge\; \alpha \sum_{i \in I} w_i, \\
-& \sum_{i \in I} s_i\, y_i \;\ge\; \beta\, S, \\
-& x_j \in \{0,1\}, \; y_i \in \{0,1\},
-\end{aligned}
-$$
+\min \;\; \omega_1 \frac{d_G^{+}}{G} \;+\; \omega_2 \frac{d_r^{-}}{\gamma \sum_{i \in I} r_i}
+$$ {#eq-gp-obj}
 
-where $\beta \in [0,1]$ is the minimum fraction of total weighted revenue/traffic that must be protected. This is equivalent to Model C but gives the decision-maker a directly interpretable target. Varying $\beta$ (and $\alpha$) traces the Pareto frontier of cost against protected importance.
-
-### Model E: lexicographic (priority-ordered) objectives
-
-Stage 1 solves Model A to obtain the minimum cost $z_1^*$. Stage 2 fixes cost at (or within a tolerance $\delta$ of) the optimum and maximises protected importance:
+subject to the original constraints
 
 $$
-\begin{aligned}
-\max \quad & \sum_{i \in I} s_i\, y_i \\[4pt]
-\text{s.t.} \quad
-& \sum_{j \in J} c_j\, x_j \le (1+\delta)\, z_1^*, \\
-& \text{all constraints of Model A.}
-\end{aligned}
-$$
-
-This guarantees that, among all cost-minimal (or near cost-minimal) deployments, the one protecting the most important sites is chosen.
-
-### Optional: favouring important generator locations
-
-If you also want the *chosen generator sites themselves* to be high-ranked, add a term in the site-selection variables, with $s_j$ the importance score of candidate site $j$:
+y_i \le \sum_{j \in I} a_{ij}\, x_j \qquad \forall i \in I
+$$ {#eq-gp-cover}
 
 $$
-\max \quad \sum_{i \in I} s_i\, y_i \;+\; \gamma \sum_{j \in J} s_j\, x_j,
-\qquad \gamma \ge 0 .
+\sum_{i \in I} w_i\, y_i \ge \beta \sum_{i \in I} w_i
+$$ {#eq-gp-target}
+
+and the two goal constraints
+
 $$
-
-## Option F
+\sum_{j \in I} x_j - d_G^{+} \le G
+$$ {#eq-gp-goal-gen}
 
 $$
-\begin{aligned}
-\max \quad Z ={}&
-\lambda_R \sum_{j \in J} \widetilde{r}_j x_j
-+ \lambda_S \sum_{j \in J} s_j x_j
-- \lambda_C \sum_{j \in J} \widetilde{g}_j x_j
-\\[8pt]
-\text{subject to} \quad
-& \sum_{k \in K} w_k y_k
-\geq \alpha \sum_{k \in K} w_k
-\\[6pt]
-& y_k \leq \sum_{j \in J} C_{kj} x_j,
-&& \forall k \in K
-\\[6pt]
-& \sum_{j \in J} x_j \leq G
-\\[6pt]
-& x_j \in \{0,1\},
-&& \forall j \in J
-\\[4pt]
-& y_k \in \{0,1\},
-&& \forall k \in K
-\end{aligned}
+\sum_{i \in I} r_i\, y_i + d_r^{-} \ge \gamma \sum_{i \in I} r_i
+$$ {#eq-gp-goal-rev}
+
 $$
+x_j \in \{0,1\}, \quad y_i \in [0,1], \quad d_G^{+}, d_r^{-} \ge 0
+$$ {#eq-gp-domain}
 
-where\
+Where $G$ is the initial optimal solution from the LP formulation in Section 1.
 
--   $J$: Set of candidate sites where generators could be deployed.
--   $K$: Set of geographic cells used to represent the coverage area.
--   $x_j \in \{0,1\}$: Binary decision variable equal to 1 if a generator is deployed at site $j$, and 0 otherwise.
--   $y_k \in \{0,1\}$: Binary indicator equal to 1 if geographic cell $k$ retains adequate network coverage during load shedding, and 0 otherwise.
--   $C_{kj} \in \{0,1\}$: Coverage indicator equal to 1 if site $j$, when operational, provides adequate coverage to cell $k$, and 0 otherwise.
--   $w_k$: Area weight of geographic cell $k$.
--   $\alpha$: Minimum required proportion of the total geographic area that must retain adequate coverage.
--   $G$: Maximum number of generators available for deployment.
--   $\widetilde{r}_j$: Normalised revenue associated with site $j$.
--   $s_j$: Normalised importance score for site $j$, derived from its business ranking.
--   $\widetilde{g}_j$: Normalised generator deployment cost at site $j$.
--   $\lambda_R, \lambda_S, \lambda_C \geq 0$: Objective weights representing the relative importance of revenue, site ranking, and generator cost, respectively.
+```{r,avg_rev_distr,eval=T,echo=F}
+
+site_gdf = st_as_sf(pa_site_locations, coords = c("longitude", "latitude"), crs = 4326)
+
+
+
+site_ranges_gdf=st_read("site_range_shapes_20250601.shp") %>% rename(atoll_site_id=atoll_site)
+
+# Inner join
+#class(site_ranges_gdf)
+
+cpt_site_ranges_gdf= inner_join(st_drop_geometry(site_gdf)  ,site_ranges_gdf,by='atoll_site_id')
+
+cpt_site_ranges_gdf <- st_as_sf(cpt_site_ranges_gdf, crs = 4326)
+
+# color code by num subs
+cpt_site_ranges_rev_gdf=inner_join(pa_site_monthly_rev,unique(select(cpt_site_ranges_gdf,atoll_site_id,geometry)), by='atoll_site_id')
+
+cpt_site_ranges_rev_gdf=st_as_sf(cpt_site_ranges_rev_gdf)
+cpt_site_ranges_rev_gdf$monthly_rev=as.numeric(cpt_site_ranges_rev_gdf$monthly_rev)
+
+
+pal = colorNumeric(
+  palette = "YlOrRd",
+  domain = cpt_site_ranges_rev_gdf$monthly_rev
+)
+
+
+leaflet(cpt_site_ranges_rev_gdf) |> 
+  addTiles() |>  # Adds default OpenStreetMap background tiles
+  setView(lng = 18.42322, lat = -33.92584, zoom = 12) %>% 
+    addPolygons(
+    color = "blue",
+    weight = 1,
+    opacity = 0.8,
+    fillColor = ~pal(monthly_rev),
+    fillOpacity = 0.9,
+        popup = ~paste0(
+      "Site: ", atoll_site_id,
+      "<br> Avg Monthly Site Revenue: ",monthly_rev
+    )
+  )|>
+  addLegend(
+    pal = pal,
+    values = ~monthly_rev,
+    title = "Avg Monthly Site Revenue",
+    position = "bottomright"
+  )
+
+```
+
+For the above simulation the goal constrains are defined as:\
+
+```{r,goal_set_up, eval=T, echo=FALSE,include=F}
+
+#
+w1=0.5
+w2=0.5
+gamma=0.95 # 1-gamma=revenue loss percentage, gamma is the lease rev that we want to preserve
+
+# normalize revenue
+cpt_site_ranges_rev_gdf$rev_norm = (cpt_site_ranges_rev_gdf$monthly_rev - min(cpt_site_ranges_rev_gdf$monthly_rev , na.rm = TRUE)) / 
+                  (max(cpt_site_ranges_rev_gdf$monthly_rev , na.rm = TRUE) - min(cpt_site_ranges_rev_gdf$monthly_rev , na.rm = TRUE))
+
+
+tot_rev=st_drop_geometry(unique(cpt_site_ranges_rev_gdf)) %>% summarize(sum(rev_norm)) %>% pull() # Total avg monthly revenue thant we want to preserve
+
+
+# we want to preserve the normalized revenue
+G2=gamma*tot_rev
+
+# Let G1 be the optimum number of generators that were determined from Section 1
+
+G1=lp_soln$optimum # total number of generators
+G1
+
+```
+
+#### Archimedian Set up and Solution
+
+```{r,mogp_set_up_arch, eval=T,echo=F ,include=F}
+
+# order of obj (dg,dr,x1,x2,....,xn, y1,y2,....yn) yi is the revenue that is still preserved at a site if it either got a generator OR that ,xi s ite
+xn_coeff=rep(0,nrow(cpt_site_ranges_rev_gdf))
+yn_coeff=rep(0,nrow(cpt_site_ranges_rev_gdf))
+dg_coeff=w1/G1
+dr_coeff=w2/G2
+
+
+# obj vector 
+obj_vec_ac=c(dg_coeff,dr_coeff,xn_coeff,yn_coeff);length(obj_vec_ac)
+
+# Goal Constraints
+g1_constraints=matrix(c(-1,0, rep(1,nrow(cpt_site_ranges_rev_gdf) ),rep(0,nrow(cpt_site_ranges_rev_gdf) )),ncol=length(obj_vec_ac),nrow=1)
+
+
+rev_coeff=st_drop_geometry(cpt_site_ranges_rev_gdf) %>% select(rev_norm) %>% pull()
+
+rev_coeff_g2_2=matrix(rev_coeff,nrow=1,ncol=length(rev_coeff)) # coeff of yi in G2 constraint
+
+# In 
+
+xn_coeff_g2_2=matrix(0,nrow=1,ncol=nrow(cpt_site_ranges_rev_gdf))
+
+
+dg_coeff_g2_2=matrix(0,nrow=1,ncol=1) # coeff of dg in G2 constraint
+
+dr_coeff_g2_2=matrix(0,nrow=1,ncol=1) # coeff of dr in G2 constraint
+
+g2_constraint=cbind(dg_coeff_g2_2,dr_coeff_g2_2,xn_coeff_g2_2,rev_coeff_g2_2);dim(g2_constraint)
+
+
+# Hard Constraints from Section 1, extended to include yi and dg and dr
+dg_coeff_hrd_const=matrix(0,nrow=dim(neigh_mat)[1],ncol=1)
+dr_coeff_hrd_const=matrix(0,nrow=dim(neigh_mat)[1],ncol=1)
+
+a1=cbind(dg_coeff_hrd_const,dr_coeff_hrd_const,y_mat,-1*neigh_mat) # expanded hard constraint matrix 1
+
+# dim(a1)[2];length(obj_vec_ac)
+
+
+# Expanded hard constraint 2
+
+dg_coeff_hrd_const2=matrix(0,ncol=1,nrow=1)
+dr_coeff_hrd_const2=matrix(0,ncol=1,nrow=1)
+
+yi_coeff_hrd_const2=matrix(sub_coeff,nrow=1,ncol=length(yn_coeff)) # coeff of yi in second hard constraint
+xi_coeff_hrd_const2=matrix(0,nrow=1,ncol=length(yn_coeff)) # coeff of xi in second hard constraint
+
+dim(dg_coeff_hrd_const2)[2];dim(dr_coeff_hrd_const2)[2];dim(
+yi_coeff_hrd_const2)[2];dim(xi_coeff_hrd_const2)[2]
+
+# expanded second hard constraint matrix
+a2=cbind(dg_coeff_hrd_const2,dr_coeff_hrd_const2,xi_coeff_hrd_const2,yi_coeff_hrd_const2)
+
+
+```
+
+```{r,mogp_arch_soln, eval=T,echo=F ,include=F}
+
+
+obj_vec_ac=c(dg_coeff,dr_coeff,xn_coeff,yn_coeff)
+
+constraint_mat_arc=rbind(g1_constraints,g2_constraint,a1,a2); dim(constraint_mat_arc)
+
+my_types_b = rep("B",(  length(xn_coeff)+(length(yn_coeff) ))) # enforces boolean output for xi, yi!
+my_types_c = rep("C",1) # continuous output for dr
+my_types_i = rep("I",1) # integer output for dg
+
+my_types_ar=c(my_types_i,my_types_c,my_types_b );length(my_types_ar)
+
+
+rhs_=rbind(matrix(G1,nrow=1,ncol=1),  matrix(G2,nrow=1,ncol=1),rhs_1,rhs_2)
+dir_vec=c('<=','>=',rep('<=',dim(constraint_1)[1]),'>=');length(dir_vec)
+
+# Enter into solver
+
+
+mogp_arc_soln=Rglpk_solve_LP(obj = obj_vec_ac, mat =constraint_mat_arc , types = my_types_ar,dir = dir_vec, rhs = rhs_, max = FALSE) # minimization problm
+
+ mogp_arc_soln # Interprete tomorrow
+```
+
+#### Chebyshev Set up and Solution
 
 # Section 3: Simulated Annealing Formulation\*
 
