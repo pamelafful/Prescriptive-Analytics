@@ -77,13 +77,15 @@ pa_site_locations <- read_csv("pa_site_locations.csv")
 
 pa_site_avg_monthly_subs=pa_site_monthly_subs %>% rename(date_time=partition_data_timestamp) %>%
   group_by(atoll_site_id) %>% summarise(avg_nr_subs=mean(nr_subs),avg_nr_unique_subs=mean(nr_unique_subs))
+
+pa_site_avg_monthly_subs
 ```
 
 # Optimal Site Generator Distribution
 
-**Data Sources: Vodacom data, localized for the Cape Town**
+**Data Sources: Vodacom data, localized for the Cape Town and some surrounding areas**
 
-#### Problem Statement 
+#### Problem Statement
 
 Load shedding and insecure power supply put a strain on network servicing sites, affecting coverage and availability of those sites with material impact on site revenue generation from user traffic flows. Running generators at sites impacted by power disruptions offers the immediate solution to ensuring sites continue to run during interrupted power supply; however, there is a limited supply of generators that can be deployed to sites, as well as the cost associated with the deployment and running of the generators. Vodacom would like to develop a strategy for the optimal distribution of generators to important sites with the minimum cost attached whilst ensuring coverage needs and availability are maintained.
 
@@ -113,7 +115,7 @@ cpt_site_ranges_gdf= inner_join(st_drop_geometry(site_gdf)  ,site_ranges_gdf,by=
 cpt_site_ranges_gdf <- st_as_sf(cpt_site_ranges_gdf, crs = 4326)
 
 # color code by num subs
-cpt_site_ranges_subs_gdf=inner_join(pa_site_avg_monthly_subs,cpt_site_ranges_gdf, by='atoll_site_id')
+cpt_site_ranges_subs_gdf=inner_join(pa_site_avg_monthly_subs,unique(select(cpt_site_ranges_gdf,atoll_site_id,geometry)), by='atoll_site_id')
 
 cpt_site_ranges_subs_gdf=st_as_sf(cpt_site_ranges_subs_gdf)
 
@@ -152,7 +154,7 @@ cpt_site_ranges_gdf$perimeter <- as.numeric(
 ) / 1000
 
 # Get avg site range
-mean(cpt_site_ranges_gdf$perimeter)
+
 ```
 
 # Section 1: Deterministic MLP Formulation
@@ -233,17 +235,23 @@ $$ {#eq-domain}
 
 @eq-cover states that the subscribers of site $i$ can be served only if some site within radius $R$ of $i$ (including $i$ itself) has a generator - which is the **set covering constraint.** @eq-target requires the served subscribers to total at least a fraction $\beta$ of all subscribers. @eq-obj minimizes the number of generators deployed.
 
-```{r, neigh_matrix}
+```{r,matrix_set_up,eval=T,echo=F}
 
-#Neighbourhood matrix of sites (symmetric) that only populates 1 if two sites are within R/perimetr distance of each other- thus they overlap and 0 otherwise
+#Neighbourhood matrix of sites (symmetric) that only populates 1 if two sites are within R/perimeter distance of each other- thus they overlap and 0 otherwise
 
-sites=site_gdf %>%  select (atoll_site_id)
+
+
+# only use site that we have complete sub information for
+sites=st_as_sf(inner_join(site_gdf,st_drop_geometry(site_ranges_gdf),by='atoll_site_id'), crs = 4326) %>% select(atoll_site_id)
+sites=unique(sites)
 
 dist_matrix =st_distance(sites) 
 dist_matrix=as.matrix(units::set_units(dist_matrix, "km"))
-# apply neighbourhood condition
 
-R=units::set_units(4.24,'km')
+
+# apply neighbourhood condition
+r=mean(cpt_site_ranges_gdf$perimeter)
+R=units::set_units(round(r,2),'km')
 
 neigh_mat=ifelse(dist_matrix<= R,1,0)
 
@@ -253,6 +261,96 @@ dim(neigh_mat)
  # Check if matrix is symmetrix
 isSymmetric(neigh_mat)
 
+# sub cov matrix= diag matrix
+# A sub at site i can only access site service if a generator is at its home site or neigboring site
+
+y_mat=matrix(0,nrow=dim(neigh_mat)[1] ,ncol=dim(neigh_mat)[2])
+diag(y_mat)=1
+
+# 1st matrix constraint
+constraint_1=y_mat-neigh_mat
+dim(constraint_1)
+
+# constrint 2, vector to append at the end of const 1
+# avg uniq sub at each site
+
+sub_coeff=st_drop_geometry(cpt_site_ranges_subs_gdf) %>% select(avg_nr_unique_subs) %>% pull()
+
+constraint_2=matrix(sub_coeff,nrow=1,ncol=dim(constaint_1)[2])
+
+# check dim
+#dim(rbind(constaint_1,constraint_2))
+
+# constrain values
+beta=0.9
+
+# total subs covered at full capacity
+total_subs=st_drop_geometry(cpt_site_ranges_subs_gdf)  %>% summarise(total_unique_subs=sum(avg_nr_unique_subs)) %>% pull()
+
+# RHS of constrain 1
+rhs_1=matrix(rep(0, dim(constaint_1)[2]),nrow=dim(constraint_1)[1],ncol=1)
+
+# RHS of constrain 2
+rhs_2=matrix(beta*total_subs,ncol=1,nrow=1)
+
+
+
+```
+
+```{r,solve_LP, echo=F, eval=T}
+
+obj_vec=rep(1,nrow(cpt_site_ranges_subs_gdf)) # xi
+
+
+constraint_mat=rbind(constaint_1,constraint_2)
+
+my_types = rep("B",length(obj_vec)) # enforces boolean output!
+rhs_=rbind(rhs_1,rhs_2)
+dir_vec=c(rep('<=',dim(constraint_1)[1]),'>=')
+
+# Enter into solver
+
+
+lp_soln=Rglpk_solve_LP(obj = obj_vec, mat =constraint_mat , types = my_types,dir = dir_vec, rhs = rhs_, max = FALSE) # minimization problm
+
+
+# Yay!
+
+
+
+```
+
+```{r,soln_plot,eval=T,echo=F}
+
+# get indicies
+
+cpt_site_ranges_subs_gdf$gets_gen=lp_soln$solution
+
+
+
+# Now map whic sites got a generator
+leaflet(cpt_site_ranges_subs_gdf) |> 
+  addTiles() |> 
+  setView(lng = 18.42322, lat = -33.92584, zoom = 12) |> 
+  addPolygons(
+    color = "black",
+    weight = 1,
+    opacity = 0.8,
+    fillColor = ~ifelse(gets_gen == 1, "blue", "white"),
+    fillOpacity = 0.9,
+    popup = ~paste0(
+      "Site: ", atoll_site_id,
+      "<br>Gets generator: ", gets_gen,
+      "<br>#Unique Subscribers covered: ", avg_nr_unique_subs
+    )
+  ) |>
+  addLegend(
+    position = "bottomright",
+    colors = c("blue", "white"),
+    labels = c("Gets generator (1)", "No generator (0)"),
+    title = "Generator Allocation",
+    opacity = 0.9
+  )
 ```
 
 # Section 2: Deterministic MOLP Formulation- Revenue and Site Rankings
