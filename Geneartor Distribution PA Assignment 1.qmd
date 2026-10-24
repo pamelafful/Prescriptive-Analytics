@@ -57,23 +57,56 @@ execute:
   enabled: true
 ---
 
+```{r,set_up,echo=F,eval=T,include=F}
+library(readr)
+library(Rglpk)
+library(leaflet)
+library(knitr)
+library(lubridate)
+library(dplyr)
+library(ggplot2)
+library(sf)
+```
+
+```{r,load_data,echo=F,eval=T,include=F}
+
+pa_site_availability <- read_csv("pa_site_availability.csv")
+pa_site_monthly_rev <- read_csv("pa_site_monthly_rev.csv")
+pa_site_monthly_subs <- read_csv("pa_site_monthly_subs.csv")
+pa_site_locations <- read_csv("pa_site_locations.csv")
+
+pa_site_avg_monthly_subs=pa_site_monthly_subs %>% rename(date_time=partition_data_timestamp) %>%
+  group_by(atoll_site_id) %>% summarise(avg_nr_subs=mean(nr_subs),avg_nr_unique_subs=mean(nr_unique_subs))
+```
+
 # Optimal Site Generator Distribution
 
-Data Sources: Vodacom data, localized for the Vodacom KZN Region
+**Data Sources: Vodacom data, localized for the Cape Town**
 
-## Problem Statement \* will add more
+#### Problem Statement 
 
 Load shedding and insecure power supply put a strain on network servicing sites, affecting coverage and availability of those sites with material impact on site revenue generation from user traffic flows. Running generators at sites impacted by power disruptions offers the immediate solution to ensuring sites continue to run during interrupted power supply; however, there is a limited supply of generators that can be deployed to sites, as well as the cost associated with the deployment and running of the generators. Vodacom would like to develop a strategy for the optimal distribution of generators to important sites with the minimum cost attached whilst ensuring coverage needs and availability are maintained.
 
 Key Definitions:
 
--   Atoll Site ID: Identifier for a physical structure that houses antennas, transmitters, receivers, and networking hardware needed to transmit and receive voice, data, and internet signals. These have a set coverage shape that defines the span of the site's coverage over a physical space (word this better and added refrence)
+-   Atoll Site ID: Identifier for a physical structure that houses antennas, transmitters, receivers, and networking hardware needed to transmit and receive voice, data, and internet signals. These have a set coverage shape that defines the span of the site's coverage over a physical space (word this better and add refrence)
 
 -   Site Availability: The percentage of time that a specific telecom site, including its radio equipment, power supplies, backhaul, and virtual or physical connection links, is fully operational and capable of processing traffic. (<https://medium.com/>@saeedfelegari/site-availability-in-telecom-metrics-architecture-and-the-real-requirements-behind-the-numbers-37cf574ba711.
 
     -   This metric is measured as the percentage number of seconds a site is operational over the total number of seconds in a month, with 100%= full availability.
 
-EDA: Site Counts and Spatial Distributions
+# EDA: Site Counts and Spatial Distributions
+
+```{r, site_distributions,echo=F}
+
+site_gdf = st_as_sf(pa_site_locations, coords = c("longitude", "latitude"), crs = 4326)
+
+site_gdf
+
+
+
+
+```
 
 # Section 1: Deterministic MLP Formulation
 

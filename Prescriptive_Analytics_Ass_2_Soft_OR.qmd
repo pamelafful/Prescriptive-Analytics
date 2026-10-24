@@ -98,7 +98,7 @@ A technical system owned by by network planners, engineers that priorities and u
 
 **Rich Picture** **the problem**
 
-![](images/clipboard-1466494151.png){width="552"}
+![](images/clipboard-1466494151.png){fig-align="center" width="552"}
 
 Activities Required to make the Root Definition True
 
