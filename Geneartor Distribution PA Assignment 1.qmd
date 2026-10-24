@@ -101,125 +101,159 @@ Key Definitions:
 
 site_gdf = st_as_sf(pa_site_locations, coords = c("longitude", "latitude"), crs = 4326)
 
-site_gdf
 
 
+site_ranges_gdf=st_read("site_range_shapes_20250601.shp") %>% rename(atoll_site_id=atoll_site)
+
+# Inner join
+#class(site_ranges_gdf)
+
+cpt_site_ranges_gdf= inner_join(st_drop_geometry(site_gdf)  ,site_ranges_gdf,by='atoll_site_id')
+
+cpt_site_ranges_gdf <- st_as_sf(cpt_site_ranges_gdf, crs = 4326)
+
+# color code by num subs
+cpt_site_ranges_subs_gdf=inner_join(pa_site_avg_monthly_subs,cpt_site_ranges_gdf, by='atoll_site_id')
+
+cpt_site_ranges_subs_gdf=st_as_sf(cpt_site_ranges_subs_gdf)
 
 
+pal = colorNumeric(
+  palette = "YlOrRd",
+  domain = cpt_site_ranges_gdf$avg_nr_unique_subs
+)
+
+
+leaflet(cpt_site_ranges_subs_gdf) |> 
+  addTiles() |>  # Adds default OpenStreetMap background tiles
+  setView(lng = 18.42322, lat = -33.92584, zoom = 12) %>% 
+    addPolygons(
+    color = "blue",
+    weight = 1,
+    opacity = 0.8,
+    fillColor = ~pal(avg_nr_unique_subs),
+    fillOpacity = 0.9,
+        popup = ~paste0(
+      "Site: ", atoll_site_id,
+      "<br> #Unique Subscribers covered: ",avg_nr_unique_subs
+    )
+  )|>
+  addLegend(
+    pal = pal,
+    values = ~avg_nr_unique_subs,
+    title = "#Unique Subscribers Covered",
+    position = "bottomright"
+  )
+
+
+# Get site perimeters in KM
+cpt_site_ranges_gdf$perimeter <- as.numeric(
+  st_length(st_boundary(cpt_site_ranges_gdf))
+) / 1000
+
+# Get avg site range
+mean(cpt_site_ranges_gdf$perimeter)
 ```
 
 # Section 1: Deterministic MLP Formulation
 
-The generator deployment problem lends itself to the set covering problem formulation. In this case, we would like to deploy the minimum number of sites (and the associated cost) subject to the constraint that the aggregate availability over the region is \>=95%. Sites also neighbour each other such that their coverage may overlap in certain regions where sites are densely clustered.
+The generator deployment problem lends itself to the set covering formulation. In this case, we would like to deploy generators the minimum number of sites (and the associated cost) subject to the constraint is \>=95% and at least 90% of total subscribers at full peak/availability can access the network during times of load shedding.
 
-Assumptions:
+To necessitate this, a few key assumptions have to made:
 
--   Each site can get only one generator
+-   Each site can get only one generator. All cells for each technology (2G,3G,4G,5G) are fully powered by said generator on the site.
 
--   Average site coverage= 30K radius
+-   The cost associated with running a generator is entirely captured by the fuel cost, thus transportation costs are disregarded for now as the generator is deployed once at a site, if that site is chosen. \* get the average cost of fueling and running a mobile generator for n hours
 
--   Model for a Stage 1 load shedding schedule with at most 1 power outage per day.
+-   We model for Stage 1 load shedding schedule with at most 1 power outage per day for 2hrs .Load shedding affects all sites at the same time. Load shedding happens at peak hours/demand across sites.
+
+-   Average site coverage perimeter=4.24KM, and these site coverage overlap if they are withing this distance of each other. This Site $j$ can serve the subscribers of site $i$ if $d_{ij} \le R$, were R=4.24KM. A site always covers itself.
+
+-   Subscriber location. All subscribers of site $i$ are treated as located at site $i$, so they are either entirely within reach of a powered site or not. This assumes concentrated subscriber densities.
+
+-   Subscribers can connect coverage/network of neighboring sites fluidly (if they are within the average site perimeter). Thus is if one site goes one, and another site within the overlap radius has a generator, then the a subscriber within that radius can access the generator-ran site's network/coverage with no signal degradation at site edges.
+
+-   Unlimited absorption. A powered site can absorb all subscribers of every site within its radius, with no capacity limit.
+
+-   Peak demand. $w_i$ is the subscriber count at site $i$ at full peak. Coverage target. At least 90% of total peak subscribers must be served during the outage.
 
 What I need: Coverage matrix to get the distances between sites.
 
-LP Formulation:\
-
-## Mathematical formulation
+## Partial Set Covering Formulation
 
 ### Sets and parameters
 
-Let $J$ be the set of candidate generator sites and $I$ the set of elementary demand cells obtained by overlaying the coverage polygons (or from a regular grid over the region of interest).
-
 $$
-a_{ij} =
+\begin{aligned}
+I &: \text{set of sites, indexed by } i, j \\
+d_{ij} &: \text{distance between sites } i \text{ and } j \text{ (km)} \\
+R &: \text{coverage perimeter (km)} \\
+a_{ij} &=
 \begin{cases}
-1 & \text{if cell } i \in I \text{ lies within the coverage polygon of site } j \in J,\\
-0 & \text{otherwise,}
-\end{cases}
+1 & \text{if } d_{ij} \le R \quad (\text{so } a_{ii} = 1) \\
+0 & \text{otherwise}
+\end{cases} \\
+w_i &: \text{peak unique subscribers at site } i \\
+\beta &= 0.90 : \text{minimum fraction of total subscribers that must be served}
+\end{aligned}
 $$
-
-where $c_j$ is the cost of placing a generator at site $j$ ($c_j = 1$ if the objective is simply the number of generators), $w_i$ is the weight of cell $i$ (area, or population/traffic if available), and $\alpha \in (0,1]$ is the minimum required fraction of weighted coverage.
 
 ### Decision variables
 
 $$
-x_j =
-\begin{cases}
-1 & \text{if a generator is placed at site } j,\\
-0 & \text{otherwise,}
-\end{cases}
-\qquad
-y_i =
-\begin{cases}
-1 & \text{if cell } i \text{ is covered,}\\
-0 & \text{otherwise.}
-\end{cases}
-$$
-
-### Model A: minimum-cost partial set covering
-
-$$
 \begin{aligned}
-\min \quad & \sum_{j \in J} c_j \, x_j \\[4pt]
-\text{s.t.} \quad
-& y_i \le \sum_{j \in J} a_{ij}\, x_j && \forall\, i \in I, \\
-& \sum_{i \in I} w_i \, y_i \;\ge\; \alpha \sum_{i \in I} w_i, \\
-& x_j \in \{0,1\} && \forall\, j \in J, \\
-& y_i \in \{0,1\} && \forall\, i \in I.
+x_j &\in \{0,1\} && \text{1 if a generator is deployed at site } j \\
+y_i &\in \{0,1\} && \text{1 if the subscribers of site } i \text{ are served during the outage}
 \end{aligned}
 $$
 
-The first constraint links coverage to placement: a cell can only be counted as covered if at least one selected site's polygon contains it. The second enforces the minimum weighted coverage target. Setting $\alpha = 1$ and dropping the $y_i$ variables recovers the classical set covering problem $\sum_{j} a_{ij} x_j \ge 1$ for all $i$.
+### Model
 
-### Model B: maximal covering (budget- or count-constrained)
+Minimize the number of generators deployed:
 
 $$
-\begin{aligned}
-\max \quad & \sum_{i \in I} w_i \, y_i \\[4pt]
-\text{s.t.} \quad
-& y_i \le \sum_{j \in J} a_{ij}\, x_j && \forall\, i \in I, \\
-& \sum_{j \in J} c_j \, x_j \le B, \\
-& x_j \in \{0,1\} && \forall\, j \in J, \\
-& y_i \in \{0,1\} && \forall\, i \in I,
-\end{aligned}
+\min \sum_{j \in I} x_j
+$$ {#eq-obj}
+
+subject to
+
 $$
+y_i \le \sum_{j \in I} a_{ij}\, x_j \qquad \forall i \in I
+$$ {#eq-cover}
 
-where $B$ is the available budget. With $c_j = 1$, replace the budget constraint by $\sum_j x_j = p$ to place exactly $p$ generators.
-
-OR :\
 $$
-\begin{aligned}
-\min \quad & Z = \sum_{j \in J} g_j x_j \\[6pt]
-\text{subject to} \quad
-& \sum_{k \in K} w_k y_k
-\geq \alpha \sum_{k \in K} w_k \\[6pt]
-& y_k \leq \sum_{j \in J} C_{kj} x_j,
-&& \forall k \in K \\[6pt]
-& \sum_{j \in J} x_j \leq G \\[6pt]
-& x_j \in \{0,1\},
-&& \forall j \in J \\[4pt]
-& y_k \in \{0,1\},
-&& \forall k \in K
-\end{aligned}
+\sum_{i \in I} w_i\, y_i \ge \beta \sum_{i \in I} w_i
+$$ {#eq-target}
+
 $$
+x_j \in \{0,1\}, \quad y_i \in \{0,1\} \qquad \forall i, j \in I
+$$ {#eq-domain}
 
-Notation
+### Interpretation
 
--   (J): set of candidate generator sites.
+@eq-cover states that the subscribers of site $i$ can be served only if some site within radius $R$ of $i$ (including $i$ itself) has a generator - which is the **set covering constraint.** @eq-target requires the served subscribers to total at least a fraction $\beta$ of all subscribers. @eq-obj minimizes the number of generators deployed.
 
-\- (K): set of geographical coverage cells.
+```{r, neigh_matrix}
 
-\- (g_j): cost of deploying a generator at site (j).
+#Neighbourhood matrix of sites (symmetric) that only populates 1 if two sites are within R/perimetr distance of each other- thus they overlap and 0 otherwise
 
-\- (x_j): 1 if a generator is deployed at site (j), and 0 otherwise.
+sites=site_gdf %>%  select (atoll_site_id)
 
-\- (y_k): 1 if geographical cell (k) retains coverage during load shedding, and 0 otherwise.
+dist_matrix =st_distance(sites) 
+dist_matrix=as.matrix(units::set_units(dist_matrix, "km"))
+# apply neighbourhood condition
 
-\- (C\_{kj}): 1 if site (j) can adequately cover cell (k), and 0 otherwise.
+R=units::set_units(4.24,'km')
 
-\- (w_k): weight of cell (k), such as its area
+neigh_mat=ifelse(dist_matrix<= R,1,0)
 
-. - (\alpha): minimum required coverage proportion (e.g. 0.95). - (G): maximum number of available generators.
+# matrix(neigh_mat,nrow=)
+dim(neigh_mat)
+
+ # Check if matrix is symmetrix
+isSymmetric(neigh_mat)
+
+```
 
 # Section 2: Deterministic MOLP Formulation- Revenue and Site Rankings
 
