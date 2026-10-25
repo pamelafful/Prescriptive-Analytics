@@ -58,9 +58,12 @@ execute:
   enabled: true
 ---
 
+\newpage
+\includepdf[pages=1]{STA PLAGIARISM DECLARATION_PA_filled.pdf}
+
 # The Messy Problem
 
-**Competing Interests**
+**Competing Needs**
 
 A telecommunications company has been in a period of stalled growth, accompanied by a constrained network. The company must decide which network sites to upgrade over the next five years to remain competitive in a fast-changing and highly contested market. These decisions must balance the coverage needs of customers across different socio-economic strata, including a commitment to maintaining quality coverage in rural and remote communities, even where these are not the most revenue-generating. They are further constrained by legal and regulatory conditions governing the spectrum the company can purchase to grow its network capability, intended to ensure fair competition.\
 Additionally, the company has set a strategic ambition to transform from a traditional telecoms operator into a leader at the forefront of industry innovation, in an effort to increase shareholder value and raise the necessary capital to aid its expansion efforts. This has driven a growing push to adopt AI across its operations and business strategy, requiring significant capital expenditure that competes with network investment. The push has also generated unease within the workforce, where many employees fear that AI will make their roles redundant and feel they have not been brought along or shown a place in the company’s next strategic direction. The company’s leadership culture relies heavily on positional power and top-down decision-making, which slows feedback loops and limits the extent to which employee concerns and front-line knowledge can inform strategic choices.
