@@ -1,0 +1,315 @@
+<mxfile host="app.diagrams.net" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36">
+  <diagram id="6a731a19-8d31-9384-78a2-239565b7b9f0" name="Page-1">
+    <mxGraphModel dx="3179" dy="823" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="light-dark(#FFFFFF,#FFFFCC)" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Y2Y8ACshCpRIS6EPuGjL-1780" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;strokeColor=light-dark(#FF0000,#FF0000);strokeWidth=5;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="446" y="599.5799999999999" as="sourcePoint" />
+            <mxPoint x="624" y="671.4100000000001" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1862" edge="1" parent="1" source="1749" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#FF0000);strokeWidth=5;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="392" y="704.0764593594317" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="1749" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#2F5B7C,#FFFF00);fontFamily=Helvetica;fontSize=16;fontColor=light-dark(#000000,#000000);align=center;fontStyle=1;spacing=5;arcSize=7;perimeterSpacing=2;" value="Ability to compete in the market- reduced market share" vertex="1">
+          <mxGeometry height="85.5" width="190" x="301" y="537.5" as="geometry" />
+        </mxCell>
+        <mxCell id="Y2Y8ACshCpRIS6EPuGjL-1784" edge="1" parent="1" source="1753" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;strokeWidth=5;strokeColor=light-dark(#33FF33,#FF0000);" target="1764">
+          <mxGeometry relative="1" x="0.6031" as="geometry">
+            <Array as="points">
+              <mxPoint x="566" y="316.8" />
+              <mxPoint x="585" y="316.8" />
+            </Array>
+            <mxPoint x="585" y="163.06" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Y2Y8ACshCpRIS6EPuGjL-1785" edge="1" parent="1" source="1753" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.75;entryY=1;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;strokeColor=light-dark(#33FF33,#FF0000);strokeWidth=5;" target="1769">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1909" edge="1" parent="1" source="1753" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.25;entryY=1;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#FF0000);strokeWidth=5;" target="1778">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1753" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=#009900;fontFamily=Helvetica;fontSize=14;fontColor=light-dark(#000000,#000000);align=center;spacing=5;fontStyle=1;arcSize=7;perimeterSpacing=2;" value="Sufficient investment existing network infrastructure" vertex="1">
+          <mxGeometry height="85.5" width="150" x="402" y="289" as="geometry" />
+        </mxCell>
+        <mxCell id="1763" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#64BBE2,#E1D5E7);fontFamily=Helvetica;fontSize=14;fontColor=#FFFFFF;align=center;spacing=5;arcSize=7;perimeterSpacing=2;" value="&lt;b&gt;Increase shareholder value&lt;/b&gt;" vertex="1">
+          <mxGeometry height="85.5" width="190" x="567" y="694" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1865" edge="1" parent="1" source="1769" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#006600);strokeWidth=5;" target="1778">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="690.8" y="109" />
+              <mxPoint x="690.8" y="133.2" />
+              <mxPoint x="914.5" y="133.2" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1866" edge="1" parent="1" source="1769" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#006600);strokeWidth=5;">
+          <mxGeometry relative="1" x="0.0072" as="geometry">
+            <mxPoint x="353" y="539.02" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="1769" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#FFFF33,#FFFF00);fontFamily=Helvetica;fontSize=14;fontColor=light-dark(#000000,#000000);align=center;spacing=5;arcSize=7;perimeterSpacing=2;" value="&lt;b&gt;Inadequate Service Provision&lt;/b&gt;" vertex="1">
+          <mxGeometry height="76" width="187" x="278" y="71" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1859" edge="1" parent="1" source="1771" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#006600);entryX=0.592;entryY=0.064;entryDx=0;entryDy=0;entryPerimeter=0;strokeWidth=5;" target="1776">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="861.9685468259067" y="62.101122869961614" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="1771" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#12AAB5,#E1D5E7);fontFamily=Helvetica;fontSize=14;fontColor=#FFFFFF;align=center;spacing=5;fontStyle=1;arcSize=7;perimeterSpacing=2;" value="AI Adoption in workflow processes and strategy" vertex="1">
+          <mxGeometry height="65" width="215" x="50" y="17" as="geometry" />
+        </mxCell>
+        <mxCell id="1772" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#61C6CE,#E1D5E7);fontFamily=Helvetica;fontSize=14;fontColor=#FFFFFF;align=center;spacing=5;fontStyle=0;arcSize=7;perimeterSpacing=2;" value="&lt;b&gt;Digital Inclusion&lt;/b&gt;: &lt;b&gt;network&lt;/b&gt;&amp;nbsp;&lt;b&gt;access to poor, underserved communities&lt;/b&gt;" vertex="1">
+          <mxGeometry height="90" width="150" x="1023" y="435" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1912" edge="1" parent="1" source="1774" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;entryX=1;entryY=0.25;entryDx=0;entryDy=0;strokeColor=light-dark(#000000,#336600);strokeWidth=5;" target="1772">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1207.3" y="371" />
+              <mxPoint x="1207.3" y="456.5" />
+            </Array>
+            <mxPoint x="1255.7831131755447" y="447.76628311820673" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="1774" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#61C6CE,#E1D5E7);fontFamily=Helvetica;fontSize=14;fontColor=#FFFFFF;align=center;spacing=5;fontStyle=0;arcSize=7;perimeterSpacing=2;" value="&lt;b&gt;Acquire additional spectrum from regulator to support increased customer demand&lt;/b&gt;" vertex="1">
+          <mxGeometry height="112" width="155" x="1222" y="315" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1861" edge="1" parent="1" source="1776" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;fillColor=#008a00;strokeColor=light-dark(#005700,#006600);strokeWidth=5;" target="1763">
+          <mxGeometry relative="1" x="-0.0781" as="geometry">
+            <Array as="points">
+              <mxPoint x="758.7" y="395.8" />
+              <mxPoint x="662" y="395.8" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="1776" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#61C6CE,#E1D5E7);fontFamily=Helvetica;fontSize=14;fontColor=#FFFFFF;align=center;spacing=5;fontStyle=0;arcSize=7;perimeterSpacing=2;" value="&lt;b&gt;Transition into a Telco/technology-first company&lt;/b&gt;" vertex="1">
+          <mxGeometry height="85.5" width="150" x="737" y="12" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1804" edge="1" parent="1" source="1778" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#FF0000);strokeWidth=5;" target="1774">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1905" edge="1" parent="1" source="1778" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#006600);strokeWidth=5;" target="1772">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1778" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#FFFF00,#FFFF00);fontFamily=Helvetica;fontSize=14;fontColor=light-dark(#000000,#000000);align=center;spacing=5;fontStyle=0;arcSize=7;perimeterSpacing=2;" value="&lt;b&gt;Customer dissatisfaction with service&lt;/b&gt;" vertex="1">
+          <mxGeometry height="60" width="235.5" x="983" y="97.5" as="geometry" />
+        </mxCell>
+        <mxCell id="Y2Y8ACshCpRIS6EPuGjL-1779" edge="1" parent="1" source="1753" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=0.888;entryY=0.085;entryDx=0;entryDy=0;entryPerimeter=0;defaultLabelBackgroundColor=page;strokeColor=#33FF33;strokeWidth=5;" target="1749">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1875" edge="1" parent="1" source="Y2Y8ACshCpRIS6EPuGjL-1781" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="202.81663474483776" y="435.95739569180273" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1899" edge="1" parent="1" source="Y2Y8ACshCpRIS6EPuGjL-1781" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#FF0000);strokeWidth=5;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="194.22823637810325" y="83.83717589447474" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Y2Y8ACshCpRIS6EPuGjL-1781" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#FFFF33,#FFFF00);fontFamily=Helvetica;fontSize=14;fontColor=light-dark(#000000,#000000);align=center;spacing=5;fontStyle=1;arcSize=7;perimeterSpacing=2;" value="Fear of redundancy with coming AI adoption" vertex="1">
+          <mxGeometry height="76" width="150" x="-22" y="338" as="geometry" />
+        </mxCell>
+        <mxCell id="Y2Y8ACshCpRIS6EPuGjL-1787" edge="1" parent="1" source="Y2Y8ACshCpRIS6EPuGjL-1782" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;strokeColor=#33FF33;strokeWidth=5;" target="Y2Y8ACshCpRIS6EPuGjL-1786">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1896" edge="1" parent="1" source="Y2Y8ACshCpRIS6EPuGjL-1782" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#336600);strokeWidth=5;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="840" y="98.86670717985737" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Y2Y8ACshCpRIS6EPuGjL-1782" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=#009900;fontFamily=Helvetica;fontSize=14;fontColor=light-dark(#000000,#000000);align=center;spacing=5;fontStyle=1;arcSize=7;perimeterSpacing=2;" value="Stalled Revenue growth" vertex="1">
+          <mxGeometry height="80" width="150" x="765" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1818" edge="1" parent="1" source="Y2Y8ACshCpRIS6EPuGjL-1786" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.75;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#FF0000);strokeWidth=5;" target="1763">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Y2Y8ACshCpRIS6EPuGjL-1786" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#FFFF00,#FFFF00);fontFamily=Helvetica;fontSize=14;fontColor=light-dark(#000000,#000000);align=center;spacing=5;fontStyle=0;arcSize=7;perimeterSpacing=2;" value="&lt;b&gt;Reduced investor confidence and investment ROI&lt;/b&gt;" vertex="1">
+          <mxGeometry height="69" width="170" x="813" y="713.5" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1842" edge="1" parent="1" source="3A_35a-tP7ZGEogG8Fn1-1779" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#336600);strokeWidth=5;" target="Y2Y8ACshCpRIS6EPuGjL-1781">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1779" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=#009900;fontFamily=Helvetica;fontSize=14;fontColor=light-dark(#000000,#000000);align=center;spacing=5;fontStyle=1;arcSize=7;perimeterSpacing=2;" value="Hierarchical corporate structure with very little communication. Siloed teams" vertex="1">
+          <mxGeometry height="80" width="195.5" x="-165" y="499" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1864" edge="1" parent="1" source="1764" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#FF0000);strokeWidth=5;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="277.96" y="706.49" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="1764" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#FFFF00,#FFFF00);fontFamily=Helvetica;fontSize=14;fontColor=light-dark(#FFFF33,#000000);align=center;spacing=5;fontStyle=1;arcSize=7;perimeterSpacing=2;" value="Reduced Market Share" vertex="1">
+          <mxGeometry height="65" width="175" x="542" y="171" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1819" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#61C6CE,#E1D5E7);fontFamily=Helvetica;fontSize=14;fontColor=#FFFFFF;align=center;spacing=5;fontStyle=0;arcSize=7;perimeterSpacing=2;" value="x" vertex="1">
+          <mxGeometry height="25" width="21" x="1284" y="623" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1821" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#61C6CE,#4D9900);fontFamily=Helvetica;fontSize=14;fontColor=#FFFFFF;align=center;spacing=5;fontStyle=0;arcSize=7;perimeterSpacing=2;" value="x" vertex="1">
+          <mxGeometry height="25" width="21" x="1284" y="648" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1828" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.25;exitDx=0;exitDy=0;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1282" y="678.25" as="sourcePoint" />
+            <mxPoint x="1287.8871060923525" y="685.4745178222656" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1829" edge="1" parent="1" source="3A_35a-tP7ZGEogG8Fn1-1840" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1300.75" y="671" as="sourcePoint" />
+            <mxPoint x="1300.9473684210525" y="689.3732187371504" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1831" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=0;exitDx=0;exitDy=0;defaultLabelBackgroundColor=page;" target="3A_35a-tP7ZGEogG8Fn1-1823" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1300.75" y="671" as="sourcePoint" />
+            <mxPoint x="1300.9473684210525" y="689.3732187371504" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1823" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#61C6CE,#99CCFF);fontFamily=Helvetica;fontSize=14;fontColor=#FFFFFF;align=center;spacing=5;fontStyle=0;arcSize=7;perimeterSpacing=2;" value="x" vertex="1">
+          <mxGeometry height="25" width="21" x="1284" y="673" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1833" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#61C6CE,#FFFF00);fontFamily=Helvetica;fontSize=14;fontColor=#FFFFFF;align=center;spacing=5;fontStyle=0;arcSize=50;perimeterSpacing=2;" value="x" vertex="1">
+          <mxGeometry height="25" width="21" x="1284" y="698" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1837" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#61C6CE,#FFFFFF);fontFamily=Helvetica;fontSize=14;fontColor=#FFFFFF;align=left;spacing=5;fontStyle=0;arcSize=7;perimeterSpacing=2;" value="&lt;div&gt;&lt;br&gt;&lt;/div&gt;Goals&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="25" width="101" x="1309" y="623" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1838" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#61C6CE,#FFFFFF);fontFamily=Helvetica;fontSize=14;fontColor=#FFFFFF;align=left;spacing=5;fontStyle=0;arcSize=7;perimeterSpacing=2;" value="&lt;div&gt;Drivers&lt;/div&gt;" vertex="1">
+          <mxGeometry height="25" width="101" x="1309" y="648" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1839" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#61C6CE,#FFFFFF);fontFamily=Helvetica;fontSize=14;fontColor=#FFFFFF;align=left;spacing=5;fontStyle=0;arcSize=7;perimeterSpacing=2;" value="&lt;div&gt;Proposals&lt;/div&gt;" vertex="1">
+          <mxGeometry height="25" width="105" x="1305" y="673" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1841" edge="1" parent="1" source="3A_35a-tP7ZGEogG8Fn1-1823" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;" target="3A_35a-tP7ZGEogG8Fn1-1840" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1295" y="700" as="sourcePoint" />
+            <mxPoint x="1300.9473684210525" y="689.3732187371504" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1840" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#61C6CE,#FFFFFF);fontFamily=Helvetica;fontSize=14;fontColor=#FFFFFF;align=left;spacing=5;fontStyle=0;arcSize=7;perimeterSpacing=2;" value="&lt;div&gt;Standard Issues&lt;/div&gt;" vertex="1">
+          <mxGeometry height="22.75" width="112" x="1303.5" y="698" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1849" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#336600);strokeWidth=5;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-179.5" y="162" as="sourcePoint" />
+            <mxPoint x="97.00000000000045" y="86.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1868" edge="1" parent="1" source="3A_35a-tP7ZGEogG8Fn1-1843" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.75;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#FF0000);strokeWidth=5;" target="1769">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1869" edge="1" parent="1" source="3A_35a-tP7ZGEogG8Fn1-1843" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#336600);strokeWidth=5;" target="3A_35a-tP7ZGEogG8Fn1-1847" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1901" edge="1" parent="1" source="3A_35a-tP7ZGEogG8Fn1-1843" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#FF0000);strokeWidth=5;" target="Y2Y8ACshCpRIS6EPuGjL-1781">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1843" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#009900,#99CCFF);fontFamily=Helvetica;fontSize=14;fontColor=light-dark(#000000,#000000);align=center;spacing=5;fontStyle=1;arcSize=7;perimeterSpacing=2;" value="Employee development programs to aid AI adoption and leverage the benefits to improve the network" vertex="1">
+          <mxGeometry height="117" width="175" x="-212" y="50.5" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1907" edge="1" parent="1" source="3A_35a-tP7ZGEogG8Fn1-1845" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#006600);strokeWidth=5;" target="Y2Y8ACshCpRIS6EPuGjL-1782">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="976.7" y="616" />
+              <mxPoint x="976.7" y="480" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1914" edge="1" parent="1" source="3A_35a-tP7ZGEogG8Fn1-1845" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#336600);strokeWidth=5;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1091.5" y="526.1345391757247" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1845" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#009900,#99CCFF);fontFamily=Helvetica;fontSize=14;fontColor=light-dark(#000000,#000000);align=center;spacing=5;fontStyle=1;arcSize=7;perimeterSpacing=2;" value="Reduced network charges for disadvantaged areas" vertex="1">
+          <mxGeometry height="80" width="175" x="1004" y="618" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1853" edge="1" parent="1" source="3A_35a-tP7ZGEogG8Fn1-1846" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#006600);strokeWidth=5;" target="1763">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1846" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#009900,#99CCFF);fontFamily=Helvetica;fontSize=14;fontColor=light-dark(#000000,#000000);align=center;spacing=5;fontStyle=1;arcSize=7;perimeterSpacing=2;" value="Issuance of new shares to raise money for CAPEX efforts" vertex="1">
+          <mxGeometry height="80" width="261" x="167" y="717" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1851" edge="1" parent="1" source="3A_35a-tP7ZGEogG8Fn1-1847" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#FF0000);strokeWidth=5;" target="3A_35a-tP7ZGEogG8Fn1-1779">
+          <mxGeometry relative="1" x="-0.1678" as="geometry">
+            <Array as="points">
+              <mxPoint x="-77.5" y="530.43" />
+              <mxPoint x="-77.5" y="530.43" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1857" edge="1" parent="1" source="3A_35a-tP7ZGEogG8Fn1-1847" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.139;entryY=0.017;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#FF0000);strokeWidth=5;entryPerimeter=0;" target="Y2Y8ACshCpRIS6EPuGjL-1781">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1847" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#009900,#99CCFF);fontFamily=Helvetica;fontSize=14;fontColor=light-dark(#000000,#000000);align=center;spacing=5;fontStyle=1;arcSize=7;perimeterSpacing=2;" value="Employee-executive quarterly engagements; reemphasis of company strategy and plans thereof" vertex="1">
+          <mxGeometry height="76" width="187" x="-259" y="262" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1854" edge="1" parent="1" source="3A_35a-tP7ZGEogG8Fn1-1848" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#FF0000);strokeWidth=5;" target="3A_35a-tP7ZGEogG8Fn1-1779">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1874" edge="1" parent="1" source="3A_35a-tP7ZGEogG8Fn1-1848" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#FF0000);strokeWidth=5;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-267.4" y="737.6" />
+            </Array>
+            <mxPoint x="-189.0245349718175" y="737.6213555819747" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1848" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#009900,#99CCFF);fontFamily=Helvetica;fontSize=14;fontColor=light-dark(#000000,#000000);align=center;spacing=5;fontStyle=1;arcSize=7;perimeterSpacing=2;" value="Cross-functional working groups between Finance and Network Experts" vertex="1">
+          <mxGeometry height="69" width="175" x="-421" y="533" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1858" edge="1" parent="1" source="1776" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;innerLoopWaypoints=1;defaultLabelBackgroundColor=page;" target="1776">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1863" edge="1" parent="1" source="3A_35a-tP7ZGEogG8Fn1-1848" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;innerLoopWaypoints=1;defaultLabelBackgroundColor=page;" target="3A_35a-tP7ZGEogG8Fn1-1848">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1871" edge="1" parent="1" source="3A_35a-tP7ZGEogG8Fn1-1870" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#006600);strokeWidth=5;" target="3A_35a-tP7ZGEogG8Fn1-1779">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1877" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#006600);strokeWidth=5;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-14" y="714.375" as="sourcePoint" />
+            <mxPoint x="142.25" y="419" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1870" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#FFFF33,#FFFF00);fontFamily=Helvetica;fontSize=14;fontColor=light-dark(#000000,#000000);align=center;spacing=5;fontStyle=1;arcSize=7;perimeterSpacing=2;" value="Network engineers and planners feeling like their domain expertise are ignored when developing company growth strategy" vertex="1">
+          <mxGeometry height="106.25" width="241" x="-187.75" y="673.25" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1876" edge="1" parent="1" source="3A_35a-tP7ZGEogG8Fn1-1870" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;innerLoopWaypoints=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1.003;entryY=0.417;entryDx=0;entryDy=0;entryPerimeter=0;defaultLabelBackgroundColor=page;" target="3A_35a-tP7ZGEogG8Fn1-1870">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1878" edge="1" parent="1" source="1769" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.381;entryY=0.028;entryDx=0;entryDy=0;entryPerimeter=0;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#336600);strokeWidth=5;" target="1764">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1888" parent="1" style="shape=singleArrow;whiteSpace=wrap;html=1;fillColor=light-dark(#FFFFFF,#FF0000);" value="" vertex="1">
+          <mxGeometry height="30" width="75" x="1234" y="733" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1893" edge="1" parent="1" source="3A_35a-tP7ZGEogG8Fn1-1889" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0;exitDx=60;exitDy=30;exitPerimeter=0;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1283.7974110478945" y="795.5925027598507" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1889" parent="1" style="shape=singleArrow;whiteSpace=wrap;html=1;fillColor=light-dark(#FFFFFF,#006600);" value="" vertex="1">
+          <mxGeometry height="30" width="75" x="1234" y="767" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1890" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#61C6CE,#FFFFFF);fontFamily=Helvetica;fontSize=14;fontColor=#FFFFFF;align=left;spacing=5;fontStyle=0;arcSize=7;perimeterSpacing=2;" value="&lt;div&gt;Has a negative/decreasing effect&lt;/div&gt;" vertex="1">
+          <mxGeometry height="25" width="251" x="1321" y="733" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1894" edge="1" parent="1" source="3A_35a-tP7ZGEogG8Fn1-1888" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;innerLoopWaypoints=1;exitX=0;exitY=0;exitDx=30;exitDy=19.5;exitPerimeter=0;entryX=0;entryY=0;entryDx=0;entryDy=19.5;entryPerimeter=0;defaultLabelBackgroundColor=page;" target="3A_35a-tP7ZGEogG8Fn1-1888">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1895" parent="1" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=3;fillColor=light-dark(#61C6CE,#FFFFFF);fontFamily=Helvetica;fontSize=14;fontColor=#FFFFFF;align=left;spacing=5;fontStyle=0;arcSize=7;perimeterSpacing=2;" value="&lt;div&gt;Has a positive/increasing effect&lt;/div&gt;" vertex="1">
+          <mxGeometry height="25" width="251" x="1321" y="769.5" as="geometry" />
+        </mxCell>
+        <mxCell id="3A_35a-tP7ZGEogG8Fn1-1908" edge="1" parent="1" source="1774" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.907;entryY=0.753;entryDx=0;entryDy=0;entryPerimeter=0;defaultLabelBackgroundColor=page;strokeColor=light-dark(#000000,#336600);strokeWidth=5;" target="1753">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
