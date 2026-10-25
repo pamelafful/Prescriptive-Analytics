@@ -62,29 +62,28 @@ execute:
 
 **Competing Interests**
 
-A telecommunications company has been in a period of stalled growth, accompanied by a constrained network. The company must decide which network sites to upgrade over the next five years in order to remain competitive in a fast-changing and highly contested market. These decisions must balance the coverage needs of customers across different socio-economic strata, including a commitment to maintaining quality coverage in rural and remote communities, even where these are not the most revenue-generating. They are further constrained by legal and regulatory conditions governing the spectrum available to the company, intended to ensure fair competition, and by how that spectrum is distributed across sites already in the network.
-
-At the same time, the company has set a strategic ambition to transform from a traditional telecoms operator into a leader at the forefront of industry innovation, in line with increasing shareholder value. This has driven a growing push to adopt AI across its operations and business strategy, requiring significant capital expenditure that competes with network investment. The push has also generated unease within the workforce, where many employees fear that AI will make their roles redundant and feel they have not been brought along or shown a place in the company’s next strategic direction. Additionally, the company’s leadership culture relies heavily on positional power and top-down decision-making, which slows feedback loops and limits the extent to which employee concerns and front line knowledge can inform strategic choices.
+A telecommunications company has been in a period of stalled growth, accompanied by a constrained network. The company must decide which network sites to upgrade over the next five years to remain competitive in a fast-changing and highly contested market. These decisions must balance the coverage needs of customers across different socio-economic strata, including a commitment to maintaining quality coverage in rural and remote communities, even where these are not the most revenue-generating. They are further constrained by legal and regulatory conditions governing the spectrum the company can purchase to grow its network capability, intended to ensure fair competition.\
+Additionally, the company has set a strategic ambition to transform from a traditional telecoms operator into a leader at the forefront of industry innovation, in an effort to increase shareholder value and raise the necessary capital to aid its expansion efforts. This has driven a growing push to adopt AI across its operations and business strategy, requiring significant capital expenditure that competes with network investment. The push has also generated unease within the workforce, where many employees fear that AI will make their roles redundant and feel they have not been brought along or shown a place in the company’s next strategic direction. The company’s leadership culture relies heavily on positional power and top-down decision-making, which slows feedback loops and limits the extent to which employee concerns and front-line knowledge can inform strategic choices.
 
 #### Key Conflicts:
 
--   Competitive Edge vs Social Responsibility
+-   Revenue Growth vs Social Responsibility/Regulatory Requirements
 
 -   Technology Adoption vs Employee buy-in
 
--   Regulatory requirements vs Shareholder Value (Continued Revenue Growth)
+-   Technology Investment vs Operational Capacity
 
 # Problem Expression
 
-#### System Root Definition (Executive worldview)
+**System Root Definition (Executive worldview)**
 
-A **company-owned** system, **directed by the C-suite executives and operated by network planners, engineers and executives**, that prioritizes **and upgrades network sites and adopts AI across operations and strategy**, by **allocating limited capital between network investment and technology innovation over the next five years**, to turn a period of stalled growth and a constrained network into a competitive, innovative operator that **increases shareholder value,** **honours its fiduciary obligations and sustains quality coverage in urban, rural and remote communities**, within the limits of spectrum regulation, capital availability, competitor activity and rapid technological change.
+A **company-owned** system, **directed by the C-suite executives and operated by network planners, engineers and executives**, that prioritizes **and upgrades network sites and adopts AI across operations and strategy**, by **allocating limited capital between network investment and technology innovation over the next five years**, to turn a period of stalled growth and a constrained network into a competitive, innovative operator that **increases shareholder value,** **honours its fiduciary obligations and sustains quality coverage in urban, rural and remote communities**, within the **limits of spectrum regulation, capital availability, competitor activity and rapid technological change.**
 
 -   **Customers:** Subscribers across socio-economic strata, including rural and remote communities, and shareholders
 
 -   **Actors:** Network planners, engineers, and C-suite executives
 
--   **Transformation:** A constrained, under-invested network and a stalled-growth company become an upgraded, wider-reaching network and a competitive, innovation-led company
+-   **Transformation:** Transform a constrained, under-invested network and a stalled-growth company to become an upgraded, wider-reaching network and a competitive, innovation-led company
 
 -   **Worldview:** Quality coverage and innovation are both necessary for the company to remain viable and competitive
 
@@ -98,7 +97,7 @@ A **company-owned** system, **directed by the C-suite executives and operated by
 
 Activities Required to make the Root Definition True
 
--   Company initiatives and employee development program to use and leverage AI in daily working processes and operations. Posit the use of AI and an enhancer of the work process for employees, and not a replacement.
+-   Company initiatives and employee development program to use and leverage AI in daily working processes and operations. Posit the use of AI as an enhancer of the work process for employees, and not a replacement.
 
 -   Regulatory consultations and reporting to ensure network technology expansion is in line with legal requirements as well as ESG obligations w.r.t rural network accessibility.
 
