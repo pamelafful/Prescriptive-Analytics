@@ -594,7 +594,158 @@ mogp_arc_soln=Rglpk_solve_LP(obj = obj_vec_ac, mat =constraint_mat_arc , types =
  mogp_arc_soln # Interprete tomorrow
 ```
 
-#### Chebyshev Set up and Solution
+#### Chebyshev Formulation
+
+$$
+\lambda \ge 0 : \text{maximum weighted normalized deviation across the goals}
+$$
+
+### Model
+
+$$
+\min max(w_1d^+_G,w_2d^-_r)=D
+$$ {#eq-ch-obj}
+
+subject to the original constraints
+
+$$
+y_i \le \sum_{j \in I} a_{ij}\, x_j \qquad \forall i \in I
+$$ {#eq-ch-cover}
+
+$$
+\sum_{i \in I} w_i\, y_i \ge \beta \sum_{i \in I} w_i
+$$ {#eq-ch-target}
+
+the goal constraints
+
+$$
+\sum_{j \in I} x_j - d_G^{+} \le G
+$$ {#eq-ch-goal-gen}
+
+$$
+\sum_{i \in I} r_i\, y_i + d_r^{-} \ge \gamma \sum_{i \in I} r_i
+$$ {#eq-ch-goal-rev}
+
+the Chebyshev (minimax) constraints
+
+$$
+\omega_1 \frac{d_G^{+}}{G} \le D
+$$ {#eq-ch-max-gen}
+
+$$
+\omega_2 \frac{d_r^{-}}{\gamma \sum_{i \in I} r_i} \le D
+$$ {#eq-ch-max-rev}
+
+and the domain constraints
+
+$$
+x_j \in \{0,1\}, \quad y_i \in [0,1], \quad d_G^{+}, d_r^{-},D \ge 0
+$$ {#eq-ch-domain}
+
+```{r,cb_set_up,eval=T,echo=F}
+
+# order of obj (D,dg,dr,x1,x2,....,xn, y1,y2,....yn) yi is the revenue that is still preserved at a site if it either got a generator OR that ,xi s ite
+D_coeff=1
+dg_coeff=0
+dr_coeff=0
+xn_coeff=rep(0,nrow(cpt_site_ranges_rev_gdf))
+yn_coeff=rep(0,nrow(cpt_site_ranges_rev_gdf))
+
+
+
+
+# obj vector 
+obj_vec_cb=c(D_coeff,dg_coeff,dr_coeff,xn_coeff,yn_coeff);length(obj_vec_cb)
+
+# Goal Constraints
+g1_constraints_cb=matrix(c(0,-1,0, rep(1,nrow(cpt_site_ranges_rev_gdf) ),rep(0,nrow(cpt_site_ranges_rev_gdf) )),ncol=length(obj_vec_cb),nrow=1);dim(g1_constraints_cb)[2]
+
+
+rev_coeff=st_drop_geometry(cpt_site_ranges_rev_gdf) %>% select(rev_norm) %>% pull()
+
+rev_coeff_g2_2=matrix(rev_coeff,nrow=1,ncol=length(rev_coeff)) # coeff of yi in G2 constraint
+
+# In 
+
+xn_coeff_g2_2=matrix(0,nrow=1,ncol=nrow(cpt_site_ranges_rev_gdf))
+
+
+dg_coeff_g2_2=matrix(0,nrow=1,ncol=1) # coeff of dg in G2 constraint
+
+dr_coeff_g2_2=matrix(0,nrow=1,ncol=1) # coeff of dr in G2 constraint
+
+g2_constraint_cb=cbind( matrix(0,ncol=1,nrow=1),dg_coeff_g2_2,dr_coeff_g2_2,xn_coeff_g2_2,rev_coeff_g2_2);dim(g2_constraint_cb)
+
+
+# Hard Constraints from Section 1, extended to include yi and dg and dr
+dg_coeff_hrd_const=matrix(0,nrow=dim(neigh_mat)[1],ncol=1);dim(dg_coeff_hrd_const)
+dr_coeff_hrd_const=matrix(0,nrow=dim(neigh_mat)[1],ncol=1);dim(dr_coeff_hrd_const)
+
+a1_cb=cbind(rep(0,length(xn_coeff)),dg_coeff_hrd_const,dr_coeff_hrd_const,y_mat,-1*neigh_mat);dim(a1_cb) # expanded hard constraint matrix 1
+
+# dim(a1)[2];length(obj_vec_ac)
+
+
+# Expanded hard constraint 2
+
+dg_coeff_hrd_const2=matrix(0,ncol=1,nrow=1)
+dr_coeff_hrd_const2=matrix(0,ncol=1,nrow=1)
+
+yi_coeff_hrd_const2=matrix(sub_coeff,nrow=1,ncol=length(yn_coeff)) # coeff of yi in second hard constraint
+xi_coeff_hrd_const2=matrix(0,nrow=1,ncol=length(yn_coeff)) # coeff of xi in second hard constraint
+
+dim(dg_coeff_hrd_const2)[2];dim(dr_coeff_hrd_const2)[2];dim(
+yi_coeff_hrd_const2)[2];dim(xi_coeff_hrd_const2)[2]
+
+# expanded second hard constraint matrix
+a2_cb=cbind(matrix(0,nrow=1,ncol=1),dg_coeff_hrd_const2,dr_coeff_hrd_const2,xi_coeff_hrd_const2,yi_coeff_hrd_const2);dim(a2_cb)
+
+
+
+# Deviation constraints
+dg_ceoff_cb=w1/G1
+dr_ceoff_cb=w2/G2
+D_coeff_c1=1
+D_coeff_c2=1
+
+dev_ct_1=c(-1,dg_ceoff_cb,0,rep(0, (length(xn_coeff)+length(xn_coeff))))
+
+dev_const1=matrix(dev_ct_1,nrow=1,ncol=length(dev_ct_1));dim(dev_const1)
+
+dev_ct_2=c(-1,0,dr_ceoff_cb,rep(0, (length(xn_coeff)+length(xn_coeff))))
+
+dev_const2=matrix(dev_ct_2,nrow=1,ncol=length(dev_ct_2));dim(dev_const2)
+
+
+# positivity constraints
+
+```
+
+```{r,cb_soln,eval=T,echo=F}
+
+obj_vec_cb=obj_vec_cb
+
+constraint_mat_cb=rbind(g1_constraints_cb,g2_constraint_cb,a1_cb,a2_cb,dev_const1,dev_const2); dim(constraint_mat_cb)
+
+my_types_b = rep("B",(  length(xn_coeff)+(length(yn_coeff) ))) # enforces boolean output for xi, yi!
+my_types_c = rep("C",1) # continuous output for dr
+my_types_i = rep("I",1) # integer output for dg
+my_types_CD= rep("C",1) # integer output for D
+
+my_types_cb=c(my_types_CD,my_types_i,my_types_c,my_types_b );length(my_types_cb)
+
+
+rhs_cb=rbind(matrix(rep(0,2),nrow=2,ncol=1),matrix(G1,nrow=1,ncol=1),  matrix(G2,nrow=1,ncol=1),rhs_1,rhs_2);dim(rhs_cb)
+dir_vec_cb=c(rep('<=',2) ,'<=','>=',rep('<=',dim(constraint_1)[1]),'>=');length(dir_vec_cb)
+
+# Enter into solver
+
+
+mogp_cb_soln=Rglpk_solve_LP(obj = obj_vec_cb, mat =constraint_mat_cb, types = my_types_cb,dir = dir_vec_cb, rhs = rhs_cb, max = FALSE) # minimization problm
+
+ mogp_cb_soln # Interprete tomorrow
+
+```
 
 # Section 3: Simulated Annealing Formulation\*
 
