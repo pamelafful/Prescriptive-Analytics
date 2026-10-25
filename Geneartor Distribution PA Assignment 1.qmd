@@ -540,16 +540,16 @@ dg_coeff_g2_2=matrix(0,nrow=1,ncol=1) # coeff of dg in G2 constraint
 
 dr_coeff_g2_2=matrix(0,nrow=1,ncol=1) # coeff of dr in G2 constraint
 
-g2_constraint=cbind(dg_coeff_g2_2,dr_coeff_g2_2,xn_coeff_g2_2,rev_coeff_g2_2);dim(g2_constraint)
+g2_constraint=cbind(0,dr_coeff_g2_2,xn_coeff_g2_2,rev_coeff_g2_2);dim(g2_constraint)
 
 
 # Hard Constraints from Section 1, extended to include yi and dg and dr
 dg_coeff_hrd_const=matrix(0,nrow=dim(neigh_mat)[1],ncol=1)
 dr_coeff_hrd_const=matrix(0,nrow=dim(neigh_mat)[1],ncol=1)
 
-a1=cbind(dg_coeff_hrd_const,dr_coeff_hrd_const,y_mat,-1*neigh_mat) # expanded hard constraint matrix 1
+a1=cbind(dg_coeff_hrd_const,dr_coeff_hrd_const,-1*neigh_mat,y_mat) # expanded hard constraint matrix 1
 
-# dim(a1)[2];length(obj_vec_ac)
+# dim(a1)[2];length(obj_vec_ac)cbind(rep(0,length(xn_coeff)),dg_coeff_hrd_const,dr_coeff_hrd_const,-1*neigh_mat,y_mat)
 
 
 # Expanded hard constraint 2
@@ -674,14 +674,14 @@ dg_coeff_g2_2=matrix(0,nrow=1,ncol=1) # coeff of dg in G2 constraint
 
 dr_coeff_g2_2=matrix(0,nrow=1,ncol=1) # coeff of dr in G2 constraint
 
-g2_constraint_cb=cbind( matrix(0,ncol=1,nrow=1),dg_coeff_g2_2,dr_coeff_g2_2,xn_coeff_g2_2,rev_coeff_g2_2);dim(g2_constraint_cb)
+g2_constraint_cb=cbind( matrix(0,ncol=1,nrow=1),0,dr_coeff_g2_2,xn_coeff_g2_2,rev_coeff_g2_2);dim(g2_constraint_cb)
 
 
 # Hard Constraints from Section 1, extended to include yi and dg and dr
 dg_coeff_hrd_const=matrix(0,nrow=dim(neigh_mat)[1],ncol=1);dim(dg_coeff_hrd_const)
 dr_coeff_hrd_const=matrix(0,nrow=dim(neigh_mat)[1],ncol=1);dim(dr_coeff_hrd_const)
 
-a1_cb=cbind(rep(0,length(xn_coeff)),dg_coeff_hrd_const,dr_coeff_hrd_const,y_mat,-1*neigh_mat);dim(a1_cb) # expanded hard constraint matrix 1
+a1_cb=cbind(rep(0,length(xn_coeff)),dg_coeff_hrd_const,dr_coeff_hrd_const,-1*neigh_mat,y_mat);dim(a1_cb) # expanded hard constraint matrix 1
 
 # dim(a1)[2];length(obj_vec_ac)
 
