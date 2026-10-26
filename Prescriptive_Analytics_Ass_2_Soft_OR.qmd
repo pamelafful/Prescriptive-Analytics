@@ -108,9 +108,11 @@ Activities Required to make the Root Definition True
 
 -   Continuous engagement between employees and executives via town halls and workshops to secure employee buy-in in the broader vision and goals of the company and to ensure that executives are in the loop w.r.t employee sentiment (creates environment of open communication and feedback).
 
-####  SSM Model
+#### SSM Model
 
-####   ![Messy Problem SSM Conceptual Model](final_ssm_conceptual_model.drawio.png){.figure width="620"}
+#### ![SSM Conceptual Model 5-Year Strategy](images/latest_ssm_conceptual_model_final_pic.drawio.png)
+
+{{< pagebreak >}}
 
 # Section 2: Problem Cognitive Map
 
