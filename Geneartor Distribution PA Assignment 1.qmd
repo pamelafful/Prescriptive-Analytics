@@ -66,6 +66,7 @@ library(lubridate)
 library(dplyr)
 library(ggplot2)
 library(sf)
+library(readr)
 ```
 
 ```{r,load_data,echo=F,eval=T,include=F}
@@ -276,7 +277,7 @@ dim(constraint_1)
 
 sub_coeff=st_drop_geometry(cpt_site_ranges_subs_gdf) %>% select(avg_nr_unique_subs) %>% pull()
 
-constraint_2=matrix(sub_coeff,nrow=1,ncol=dim(constaint_1)[2])
+constraint_2=matrix(sub_coeff,nrow=1,ncol=dim(constraint_1)[2])
 
 # check dim
 #dim(rbind(constaint_1,constraint_2))
@@ -288,7 +289,7 @@ beta=0.9
 total_subs=st_drop_geometry(cpt_site_ranges_subs_gdf)  %>% summarise(total_unique_subs=sum(avg_nr_unique_subs)) %>% pull()
 
 # RHS of constrain 1
-rhs_1=matrix(rep(0, dim(constaint_1)[2]),nrow=dim(constraint_1)[1],ncol=1)
+rhs_1=matrix(rep(0, dim(constraint_1)[2]),nrow=dim(constraint_1)[1],ncol=1)
 
 # RHS of constrain 2
 rhs_2=matrix(beta*total_subs,ncol=1,nrow=1)
@@ -302,7 +303,7 @@ rhs_2=matrix(beta*total_subs,ncol=1,nrow=1)
 obj_vec=rep(1,nrow(cpt_site_ranges_subs_gdf)) # xi
 
 
-constraint_mat_lp=rbind(constaint_1,constraint_2)
+constraint_mat_lp=rbind(constraint_1,constraint_2)
 
 my_types = rep("B",length(obj_vec)) # enforces boolean output!
 rhs_=rbind(rhs_1,rhs_2)
@@ -315,6 +316,7 @@ lp_soln=Rglpk_solve_LP(obj = obj_vec, mat =constraint_mat_lp , types = my_types,
 
 
 # Yay!
+
 
 
 
@@ -353,7 +355,7 @@ leaflet(cpt_site_ranges_subs_gdf) |>
   )
 ```
 
-# Section 2: Deterministic MOLP Formulation- Incorporating Revenue-led Site Importance 
+# Section 2: Deterministic MOLP Formulation- Incorporating Revenue-led Site Importance
 
 Naturally, the choice to deploy a generator at a site is not only determined by cost alone, but by the relative importance of the site in terms of its traffic flows and revenue. Thus an additional objective to the problem would be to minimize (or at least preserve) aggregate peak traffic flow loss across sites and thus minimize (at least preserve) peak revenue loss at these sites.
 
@@ -399,7 +401,7 @@ d_r^{-} &\ge 0 : \text{shortfall of preserved revenue below target } \gamma \tex
 \end{aligned}
 $$
 
-#### Weighted Archimedian Formulation 
+#### Weighted Archimedian Formulation
 
 $$
 \min \;\; \omega_1 \frac{d_G^{+}}{G} \;+\; \omega_2 \frac{d_r^{-}}{\gamma \sum_{i \in I} r_i}
@@ -796,15 +798,77 @@ to determine whether the neighbouring solution should be accepted, with the acce
 # Discretizing the Problem: Stochastic Load Shedding Scheduling
 
 What is different:\
-One of my key assumptions initial LP formulation is that the load shedding schedule is deterministic and that all sites are experiance power outages at the same time. In reality this is not the case.
+One of my key assumptions initial LP formulation is that the load shedding schedule is deterministic and that all sites are experience power outages at the same time. In reality this is not the case.
 
-There is a stochastic element to the prevalence of the power outages and as such not all sites will experiance interrupted power at the same time and require generators. In light of this I want to model the problem as a discrete event and run simulations based on the appropriate statistical distributions of the loadshedding event.
+There is a stochastic element to the prevalence of the power outages and as such not all sites will experiance interrupted power at the same time and require generators. In light of this, the problem is formulated as a discrete event and run simulations based on the appropriate statistical distributions of the loadshedding event.
 
 Key Assumptions:
 
 -   The loadshedding stage for a given day is stochastic and as such follows an appropriate statistical distribution, however, the actual load shedding times that come as a result of that announced stage are deterministic and follow a set schedule.
 
--   Only a percetange of sites are affected by load shedding at the same time. The percentage at any given schedule is itself either stochatistic or determisitic (still to be decided.
+-   Only a percetange of sites are affected by load shedding at the same time. The percentage at any given schedule is deterministic.
+
+```{r,ls_stage_data}
+
+
+loadshedding_history <- read_csv("EskomSePush_Loadshedding_History.csv")
+
+
+# change col names
+ls_levels=sort(unique(loadshedding_history$stage))
+
+
+loadshedding_history_clean=loadshedding_history %>%
+ rename(ls_date=created_at) %>% 
+  mutate(ls_date= ymd_hms(ls_date)) %>% 
+  mutate(stage=factor(stage, levels=ls_levels)) %>% 
+  mutate(ls_date_only = floor_date(ls_date, unit = "day"))
+
+# Check distributions of ls stages
+
+loadshedding_history %>%ggplot(aes(x=stage))+
+  geom_bar(fill='lightblue')+
+  labs(
+    title='Cape Town Frequency of Load Shedding Stages: 2014-2025',
+    x='Load Shedding Stages',
+    y='Count'
+  )+
+   theme_minimal() 
+```
+
+-   Low frequencies for higher level stages
+
+-   Stage 0= no load shedding
+
+```{r,schedule_perstage}
+load_shedding_schedule_long <- read_csv("load_shedding_schedule_long.csv")
+load_shedding_schedule_long =load_shedding_schedule_long %>% rename(BlockID=slot)
+
+
+cpt_block_codes=st_read("Load_shedding_Blocks/Load_shedding_Blocks.shp")
+#View(cpt_block_codes)
+cpt_block_codes=st_transform(cpt_block_codes, crs = 4326)
+cpt_block_codes=st_make_valid(cpt_block_codes)
+
+# Join to site gdf to get where the site is located/blockID
+
+ site_df_cleaned=site_gdf %>% select(atoll_site_id) %>% distinct()
+
+site_block_id_loc=st_join(x = site_df_cleaned , y = cpt_block_codes , join = st_within) 
+#View(site_block_id_loc)
+
+# Get loadshedding shchedule of area/blockID site is located in
+
+site_ls_schedule=left_join(site_block_id_loc,load_shedding_schedule_long,by='BlockID') %>% 
+  mutate(duration=end_hour-start_hour) %>% 
+  select(atoll_site_id,BlockID,stage,from_time,to_time,duration) 
+# Join to get loadshedding scedule
+site_ls_schedule
+
+
+
+
+```
 
 ### Stochastic Load shedding stage use ditribution of stage frequencies
 
@@ -830,12 +894,7 @@ $$ within cycle day $\delta$. A stage change at time $T_n$ cancels all pending t
 $E_1$: stage announcement & time $T_n$ & draw new stage; cancel and reschedule $E_2,E_3$ \\
 $E_2$: block switch-off & timetable & $u_g \leftarrow 1$; sites on battery; schedule $E_4$ \\
 $E_3$: block switch-on & timetable & $u_g \leftarrow 0$; sites on grid; begin battery recharge \\
-$E_4$: battery depletion at $i$ & $b_i$ reaches $b_i^{\min}$ & site on generator if available, else down \\
-$E_5$: generator fuel exhaustion & $f_j$ reaches 0 & reassign sites; site down if none available \\
-$E_6$: end of horizon & $t = H$ & stop and record statistics \\
-\hline
-\end{tabular}
-\end{center}
+$E_4$: battery depletion at $i$ & $b_i$ reaches $b_i^{\min}$ & s
 
 ### Continuous state evolution between events
 
