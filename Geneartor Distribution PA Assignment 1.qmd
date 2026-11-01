@@ -108,6 +108,10 @@ Load shedding and an insecure power supply place a strain on network sites, redu
 
 ```{r, site_distributions,echo=F}
 
+#| fig-width: 12
+#| fig-height: 10
+#| out-width: 100%
+
 site_gdf = st_as_sf(pa_site_locations, coords = c("longitude", "latitude"), crs = 4326)
 
 
@@ -127,31 +131,33 @@ cpt_site_ranges_subs_gdf=inner_join(pa_site_avg_monthly_subs,unique(select(cpt_s
 cpt_site_ranges_subs_gdf=st_as_sf(cpt_site_ranges_subs_gdf)
 
 
-pal = colorNumeric(
-  palette = "YlOrRd",
-  domain = cpt_site_ranges_gdf$avg_nr_unique_subs
-)
 
-
-leaflet(cpt_site_ranges_subs_gdf) |> 
-  addTiles() |>  # Adds default OpenStreetMap background tiles
-  setView(lng = 18.42322, lat = -33.92584, zoom = 12) %>% 
-    addPolygons(
+ggplot(cpt_site_ranges_subs_gdf) +
+  geom_sf(
+    aes(fill = avg_nr_unique_subs),
     color = "blue",
-    weight = 1,
-    opacity = 0.8,
-    fillColor = ~pal(avg_nr_unique_subs),
-    fillOpacity = 0.9,
-        popup = ~paste0(
-      "Site: ", atoll_site_id,
-      "<br> #Unique Subscribers covered: ",avg_nr_unique_subs
-    )
-  )|>
-  addLegend(
-    pal = pal,
-    values = ~avg_nr_unique_subs,
-    title = "#Unique Subscribers Covered",
-    position = "bottomright"
+    linewidth = 0.2,
+    alpha = 0.9
+  ) +
+  scale_fill_gradientn(
+    colours = RColorBrewer::brewer.pal(9, "YlOrRd"),
+    name = "# Unique Subscribers\nCovered"
+  ) +
+  coord_sf(
+    xlim = c(18.35, 18.50),
+    ylim = c(-34.00, -33.85),
+    expand = FALSE
+  ) +
+  labs(
+    title = "Average Number of Unique Subscribers Covered",
+    x = "Longitude",
+    y = "Latitude"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16),
+    legend.position = "right",
+    panel.grid = element_line(color = "grey85")
   )
 
 
@@ -370,6 +376,7 @@ dist_m <- matrix(as.numeric(st_distance(polys)), n, n)     # metres
 # (a) Adjacent cells: cells that touch (10 m tolerance for digitising error)
 touch <- st_is_within_distance(polys, polys, dist = 10, sparse = FALSE)
 A_adj <- matrix(as.numeric(touch), n, n); diag(A_adj) <- 1
+w=sub_coeff
 
 
 # ---- 1. Diagnose the CURRENT radius ----------------------------------------
@@ -429,10 +436,10 @@ defs <- list(
   "Own range x 2"                = A_own(2)
 )
 
-results <- do.call(rbind, lapply(names(defs), function(nm){
-  cbind(definition = nm, solve_cover(defs[[nm]], w, beta))
-}))
-print(results, row.names = FALSE)
+# results <- do.call(rbind, lapply(names(defs), function(nm){
+#   cbind(definition = nm, solve_cover(defs[[nm]], w, beta))
+# }))
+# print(results, row.names = FALSE)
 
 # ---- 4. Where do the chosen generators sit under one definition? -----------
 x_adj <- attr(solve_cover(A_adj, w, beta), "x")   # change A_adj to the definition you pick
@@ -543,32 +550,41 @@ x_adj <- attr(solve_cover(A_adj, w, beta), "x")
 cpt_site_ranges_subs_gdf$gets_gen=x_adj
 
 # Now map whic sites got a generator
-leaflet(cpt_site_ranges_subs_gdf) |> 
-  addTiles() |> 
-  setView(lng = 18.42322, lat = -33.92584, zoom = 12) |> 
-  addPolygons(
+library(ggplot2)
+library(sf)
+
+ggplot(cpt_site_ranges_subs_gdf) +
+  geom_sf(
+    aes(fill = factor(gets_gen)),
     color = "black",
-    weight = 1,
-    opacity = 0.8,
-    fillColor = ~ifelse(gets_gen == 1, "blue", "white"),
-    fillOpacity = 0.9,
-    popup = ~paste0(
-      "Site: ", atoll_site_id,
-      "<br>Gets generator: ", gets_gen,
-      "<br>#Unique Subscribers covered: ", avg_nr_unique_subs
-    )
-  ) |>
-  addLegend(
-    position = "bottomright",
-    colors = c("blue", "white"),
-    labels = c("Gets generator ", "No generator "),
-    title = "Generator Allocation",
-    opacity = 0.9
+    linewidth = 0.2,
+    alpha = 0.9
+  ) +
+  scale_fill_manual(
+    values = c("0" = "white", "1" = "blue"),
+    labels = c("0" = "No generator", "1" = "Gets generator"),
+    name = "Generator Allocation"
+  ) +
+  coord_sf(
+    xlim = c(18.35, 18.50),
+    ylim = c(-34.00, -33.85),
+    expand = FALSE
+  ) +
+  labs(
+    title = "Generator Allocation Across Sites",
+    x = "Longitude",
+    y = "Latitude"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16),
+    legend.position = "right",
+    panel.grid = element_line(color = "grey85")
   )
 ```
 
 **Key Observation from LP formulation\
-**The linear programme gives an exact answer what the fewest generators needed so that at least 90% of subscribers sit at a site that either hosts a generator or touches a site that does.\
+**The LP solution gives an exact answer what the fewest generators needed so that at least 90% of subscribers sit at a site that either hosts a generator or touches a site that does.\
 Its core strength is that the optimum is provably the best possible for that (albeit simple) formulation, and the used the neighbourhood definition. However, it has some limitations
 
 -   It does not cater for the importance of or ranking of the site in terms of its revenue metrics.
@@ -595,8 +611,9 @@ For simplicity's sake (and available data), assume the following, in addition to
 
 Let $R_i$ denote the revenue of network site $i \in I$. Normalise each KPI to $[0,1]$:
 
-$$\{r}_i = \frac{Rev_i - \min_k Rev_k}{\max_k Rev_k - \min_k Rev_k},
-\qquad
+$$
+r_i = \frac{Rev_i - \min_k Rev_k}
+{\max_k Rev_k - \min_k Rev_k}
 $$
 
 Variable Definitions:
@@ -646,6 +663,10 @@ Where $G$ is the **initial optimal solution** from the **LP formulation in Secti
 
 ```{r,avg_rev_distr,eval=T,echo=F}
 
+#| fig-width: 12
+#| fig-height: 10
+#| out-width: 100%
+
 site_gdf = st_as_sf(pa_site_locations, coords = c("longitude", "latitude"), crs = 4326)
 
 
@@ -672,27 +693,55 @@ pal = colorNumeric(
 )
 
 
-leaflet(cpt_site_ranges_rev_gdf) |> 
-  addTiles() |>  # Adds default OpenStreetMap background tiles
-  setView(lng = 18.42322, lat = -33.92584, zoom = 12) %>% 
-    addPolygons(
-    color = "blue",
-    weight = 1,
-    opacity = 0.8,
-    fillColor = ~pal(monthly_rev),
-    fillOpacity = 0.9,
-        popup = ~paste0(
-      "Site: ", atoll_site_id,
-      "<br> Avg Monthly Site Revenue: ",monthly_rev
-    )
-  )|>
-  addLegend(
-    pal = pal,
-    values = ~monthly_rev,
-    title = "Avg Monthly Site Revenue",
-    position = "bottomright"
-  )
+# leaflet(cpt_site_ranges_rev_gdf) |> 
+#   addTiles() |>  # Adds default OpenStreetMap background tiles
+#   setView(lng = 18.42322, lat = -33.92584, zoom = 12) %>% 
+#     addPolygons(
+#     color = "blue",
+#     weight = 1,
+#     opacity = 0.8,
+#     fillColor = ~pal(monthly_rev),
+#     fillOpacity = 0.9,
+#         popup = ~paste0(
+#       "Site: ", atoll_site_id,
+#       "<br> Avg Monthly Site Revenue: ",monthly_rev
+#     )
+#   )|>
+#   addLegend(
+#     pal = pal,
+#     values = ~monthly_rev,
+#     title = "Avg Monthly Site Revenue",
+#     position = "bottomright"
+#   )
 
+
+ggplot(cpt_site_ranges_rev_gdf) +
+  geom_sf(
+    aes(fill = monthly_rev),
+    color = "blue",
+    linewidth = 0.2,
+    alpha = 0.9
+  ) +
+  scale_fill_gradientn(
+    colours = RColorBrewer::brewer.pal(9, "YlOrRd"),
+    name = "Avg Monthly\nSite Revenue"
+  ) +
+  coord_sf(
+    xlim = c(18.35, 18.50),
+    ylim = c(-34.00, -33.85),
+    expand = FALSE
+  ) +
+  labs(
+    title = "Average Monthly Site Revenue",
+    x = "Longitude",
+    y = "Latitude"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16),
+    legend.position = "right",
+    panel.grid = element_line(color = "grey85")
+  )
 ```
 
 ```{r,lp_soln_site_rank,eval=T,echo=F}
@@ -1030,7 +1079,7 @@ kable(chosen_tbl, align = c("l", "r", "r", "r", "l"),
 
 Vary the goal weights to see how the model solution and accompanying metrics change.
 
-```{r}
+```{r,eval=F,include=F}
 # =============================================================================
 # Sensitivity of the weighted Archimedean goal programme to its weights
 #
@@ -1304,24 +1353,13 @@ mogp_cb_soln=Rglpk_solve_LP(obj = obj_vec_cb, mat =constraint_mat_cb, types = my
 
 ```
 
-# Section 3: Simulated Annealing Formulation\*
+# Section 3: Simulated Annealing Formulation
 
-To apply simulated annealing on the initial LP formulation, the constrained optimization problem is transformed to its Langrangian representation which essentially incorporates the constraints of the LP problem into the objective function that will be minimized.
+To apply simulated annealing on the initial LP formulation, the constrained optimization problem is transformed to its Langrangian representation which essentially incorporates the constraints of the LP problem into the objective function that will be minimized as stated by [@beasley_integer_programming].
 
-## Lagrangian formulations of the set covering problem
+### Lagrangian formulations of the set covering problem
 
-### Assumptions
-
-\begin{enumerate}
-\item The candidate generator locations coincide with the demand sites $I$,
-and $a_{ii} = 1$ (a generator covers its own site).
-\item Coverage is binary and deterministic: $a_{ij} \in \{0,1\}$.
-\item Weights $w_i \ge 0$ are fixed, and $0 < \beta \le 1$ is the required covered fraction of $W = \sum_{i \in I} w_i$.
-\item For fixed $\mathbf{x}$ the best choice is $y_i = \min\{1, \sum_{j} a_{ij} x_j\}$,
-so $y$ can be eliminated: $C(\mathbf{x}) = \sum_{i \in I} w_i\, \mathbb{1}\{\sum_{j} a_{ij} x_j \ge 1\}$.
-\end{enumerate}
-
-### Original problem
+#### Original problem
 
 $$
 z^{*} = \min \sum_{j \in I} x_j
@@ -1339,27 +1377,17 @@ g_1(\lambda) = \lambda \beta W + \min_{\mathbf{x} \in \{0,1\}^{I}}
 \;\le\; z^{*}.
 $$
 
-The inner problem is a prize-collecting covering problem and is solved by simulated annealing.
-
-### Formulation 2: relax the linking constraints (multipliers $\mu_i \ge 0$)
-
-$$
-g_2(\boldsymbol{\mu}) = \sum_{j \in I} \min\Big\{0,\; 1 - \sum_{i \in I} a_{ij} \mu_i\Big\}
-+ \min_{\mathbf{y} \in \{0,1\}^{I}} \Big\{ \sum_{i \in I} \mu_i y_i \;:\; \sum_{i \in I} w_i y_i \ge \beta W \Big\}
-\;\le\; z^{*}.
-$$\
-
-The problem separates into independent decisions on $x_j$ and a knapsack-cover problem in $y$. Maximise $g_2$ over $\boldsymbol{\mu} \ge 0$ by subgradient steps, giving a lower bound.
-
-### Penalised objective used by simulated annealing
+Penalised objective used by simulated annealing becomes:
 
 $$
 F_{\lambda}(\mathbf{x}) = \sum_{j \in I} x_j + \lambda \max\{0,\; \beta W - C(\mathbf{x})\}.
 $$
 
-If $w_i$ are positive integers and the target is $\lceil \beta W \rceil$, any $\lambda > 1$ makes every minimiser of $F_{\lambda}$ feasible.
+In the above case $C(x)$ is the coverage value of the candidate solution (ensuring the coverage constraint is satisfied).
 
-```{r}
+A **geometric temperature update** is used in the optimization, whilst a move/up-hill update is done slightly randomly permuting or reassigning which sites get generators i.e $x_j=1$ .
+
+```{r,sa_solve,echo=F,eval=T,include=F}
 # Solving the above
 
 # =============================================================================
@@ -1375,35 +1403,12 @@ If $w_i$ are positive integers and the target is $\lceil \beta W \rceil$, any $\
 # geometric cooling, accept/reject.
 # =============================================================================
 
-set.seed(100)   # for repeatability
-
-# -----------------------------------------------------------------------------
-# 1. Data  (REPLACE THIS BLOCK WITH YOUR OWN)
-#    A : n x n 0/1 coverage matrix, A[i, j] = 1 if site i is in the coverage
-#        polygon of a generator at j (set the diagonal to 1)
-
-# site_imp=st_drop_geometry(cpt_site_ranges_rev_gdf)
-# site_imp$site_imp_weigt=site_imp$rev_norm/sum(site_imp$rev_norm)
-#site_imp %>% arrange(desc(site_imp_weigt))
-
-# A=neigh_mat
-# dim(A)
-# w= sub_coeff # vectore of site importances
-# n   <- dim(neigh_mat)[1]
-# 
-# beta   <- 0.9              # required covered fraction for subscribers
-# W      <- sum(w)
-# target <- beta * W             # (use ceiling(beta * W) if weights are integers)
-# 
-# # Penalty weight. lambda > 1 / min(w) makes every minimiser of F feasible,
-# # because covering one uncovered site then always pays for the generator.
-# lambda <- 2 / min(w[w > 0])
-
+set.seed(100)  
 
 A    = A_adj#neigh_mat          # same matrix the LP used
 diag(A) = 1
 w    = sub_coeff          # same weights the LP used
-beta = 0.9                # same target the LP used (the SA run earlier used 0.95)
+beta = 0.95               # same target the LP used (the SA run earlier used 0.95)
 n    = nrow(A)
 stopifnot(length(w) == n, all(A %in% c(0, 1)))
 
@@ -1536,15 +1541,39 @@ if(is.null(best_x)){
   stop("No feasible solution found: increase n_iter, start_temp or lambda.")
 }
 
+
+```
+
+```{r,sa_res,echo=F}
 # -----------------------------------------------------------------------------
 # 7. Results
 # -----------------------------------------------------------------------------
 #best_x <- repair_x(best_x)
 
-cat("Generators placed       :", sum(best_x), "\n")
-cat("Covered weight fraction :", round(covered_weight(best_x) / W, 4),
-    "(target", beta, ")\n")
-cat("Selected sites          :", which(best_x == 1), "\n")
+
+results_table <- data.frame(
+  Metric = c(
+    "Generators placed",
+    "Covered weight fraction",
+    "Target coverage"
+  ),
+  Value = c(
+    sum(best_x),
+    round(covered_weight(best_x) / W, 4),
+    beta
+  )
+)
+
+knitr::kable(
+  results_table,
+  col.names = c("Metric", "Value"),
+  caption = "Simulated Annealing Optimization Results",
+  align = c("l", "c")
+)
+```
+
+```{r,sa_summary_,echo=F,eval=T}
+#| fig-cap: "SA iterations vs Function, Generator Count, Temperature"
 
 par(mfrow = c(1, 3))
 plot(all_fx, type = "l", xlab = "Iteration", ylab = "Penalised objective F(x)")
@@ -1552,17 +1581,9 @@ plot(all_ngen, type = "l", xlab = "Iteration", ylab = "Generators in current sol
 plot(1:n_iter, start_temp * temp_factor ^ (1:n_iter), type = "l",
      xlab = "Iteration", ylab = "Temperature")
 par(mfrow = c(1, 1))
-
 ```
 
-### Properties
-
-\begin{itemize}
-\item \textbf{Weak duality:} $g_1(\lambda) \le z^{*}$ and $g_2(\boldsymbol{\mu}) \le z^{*}$ for all multipliers $\ge 0$.
-\item \textbf{Duality gap:} the problem is integer, so $\max_{\lambda} g_1$ and $\max_{\boldsymbol{\mu}} g_2$ can be strictly below $z^{*}$.
-\item \textbf{Role of SA:} it supplies a feasible upper bound $\sum_j x_j^{\text{best}}$, and the
-Lagrangian supplies the lower bound, giving a reportable gap.
-\end{itemize}
+The SA yielded the same solution as the exact LP implementation\*
 
 # Section 4:Discrete Event Simulation for Stochastic Load Shedding Scheduling
 
@@ -1577,7 +1598,7 @@ Key Assumptions:
 
 -   Only a percetange of sites are affected by load shedding at the same time. The percentage at any given schedule is deterministic.
 
-```{r,ls_stage_data}
+```{r,ls_stage_data,eval=F,include=F}
 
 
 loadshedding_history <- read_csv("EskomSePush_Loadshedding_History.csv")
@@ -1617,7 +1638,7 @@ loadshedding_history %>%ggplot(aes(x=stage))+
 
 -   Stage 0= no load shedding
 
-```{r,schedule_perstage}
+```{r,schedule_perstage,eval=F,include=F}
 load_shedding_schedule <- read_csv("load_shedding_schedule_long.csv")
 load_shedding_schedule =load_shedding_schedule %>% rename(BlockID=slot)
 
@@ -1684,7 +1705,7 @@ $$ with no parametric distribution assumed. Sampling uses inverse transform: dra
 \hat{F}(k) = \sum_{m=0}^{k} \hat{\pi}_m .
 $$
 
-```{r}
+```{r,freq,eval=F,include=F}
 
 # Frequency of load shedding schedules by week, in 2022 as these were load shedding heavy years
 # Get the mode stage level per week
@@ -1726,7 +1747,7 @@ weekly %>% mutate(stage=factor(stage)) %>% inner_join(weekly_cnts,by=c('week_dat
 
 ```
 
-```{r}
+```{r,eval=F,include=F}
 
 # 1. One row per stage x day_of_month x slot
 sched <- freq_sites_affected %>%
@@ -1773,7 +1794,7 @@ realised %>% group_by(stage) %>% summarise(average_weekly_affected=mean(week_pct
 realised %>% group_by(stage) %>% summarise(mean(week_pct))
 ```
 
-```{r}
+```{r,eval=F,include=F}
 install.packages("writexl")
 library(writexl)
 
