@@ -1,5 +1,6 @@
 ---
 title: ""
+bibliography: references.bib
 author: ""
 editor: visual
 format:
@@ -87,19 +88,21 @@ pa_site_avg_monthly_subs
 
 # Optimal Site Generator Distribution
 
-**Data Sources: Vodacom data, localized for the Cape Town and some surrounding areas**
+**Data Sources:**
 
-#### Problem Statement
+-   Proprietary Telecommunications Company data, localised to Cape Town and some surrounding areas.
 
-Load shedding and insecure power supply put a strain on network servicing sites, affecting coverage and availability of those sites with material impact on site revenue generation from user traffic flows. Running generators at sites impacted by power disruptions offers the immediate solution to ensuring sites continue to run during interrupted power supply; however, there is a limited supply of generators that can be deployed to sites, as well as the cost associated with the deployment and running of the generators. Vodacom would like to develop a strategy for the optimal distribution of generators to important sites with the minimum cost attached whilst ensuring coverage needs and availability are maintained.
+-   City of Cape Town Loadshedding Area data
 
-Key Definitions:
+-   Eskom Se Push Historical Loadshedding Stages Cape Town
 
--   Atoll Site ID: Identifier for a physical structure that houses antennas, transmitters, receivers, and networking hardware needed to transmit and receive voice, data, and internet signals. These have a set coverage shape that defines the span of the site's coverage over a physical space (word this better and add refrence)
+## Problem Statement
 
--   Site Availability: The percentage of time that a specific telecom site, including its radio equipment, power supplies, backhaul, and virtual or physical connection links, is fully operational and capable of processing traffic. (<https://medium.com/>@saeedfelegari/site-availability-in-telecom-metrics-architecture-and-the-real-requirements-behind-the-numbers-37cf574ba711.
+Load shedding and an insecure power supply place a strain on network sites, reducing their coverage and availability and materially affecting the revenue they generate from user traffic. Running generators at sites affected by power disruptions is an immediate way to keep them operating during interruptions. However, only a limited number of generators can be deployed, and deploying and running them is costly. The Telecommunications Company would like to develop a strategy for allocating generators optimally to important sites at minimum cost, while ensuring that coverage and availability requirements are maintained.
 
-    -   This metric is measured as the percentage number of seconds a site is operational over the total number of seconds in a month, with 100%= full availability.
+## Key Definitions
+
+**Atoll Site ID:** A unique identifier for a network site in the Atoll radio planning tool [@forsk2015]. A site is a physical location that houses the antennas, transmitters, receivers and networking hardware used to transmit and receive voice, data and internet signals. Each site has a defined coverage area, represented as a polygon, which describes the extent of its service over the surrounding geography.
 
 # EDA: Site Counts and Spatial Distributions
 
@@ -163,17 +166,13 @@ cpt_site_ranges_gdf$perimeter <- as.numeric(
 
 # Section 1: Deterministic MLP Formulation
 
-The generator deployment problem lends itself to the set covering formulation. In this case, we would like to deploy generators the minimum number of sites (and the associated cost) subject to the constraint is \>=95% and at least 90% of total subscribers at full peak/availability can access the network during times of load shedding.
+The generator deployment problem lends itself to the set covering formulation. In this case, we would like to deploy generators the minimum number of sites subject to the additional constraint that at least 90% of total subscribers at full peak/availability can access the network during times of load shedding.
 
 To necessitate this, a few key assumptions have to made:
 
 -   Each site can get only one generator. All cells for each technology (2G,3G,4G,5G) are fully powered by said generator on the site.
 
--   The cost associated with running a generator is entirely captured by the fuel cost, thus transportation costs are disregarded for now as the generator is deployed once at a site, if that site is chosen. \* get the average cost of fueling and running a mobile generator for n hours
-
--   We model for Stage 1 load shedding schedule with at most 1 power outage per day for 2hrs .Load shedding affects all sites at the same time. Load shedding happens at peak hours/demand across sites.
-
--   Average site coverage perimeter=4.24KM, and these site coverage overlap if they are withing this distance of each other. This Site $j$ can serve the subscribers of site $i$ if $d_{ij} \le R$, were R=4.24KM. A site always covers itself.
+-   Assume a Stage 1- type load shedding schedule with at most 1 power outage per day for 2.5hrs .Load shedding affects all sites at the same time. Load shedding happens at peak hours/demand across sites.
 
 -   Subscriber location. All subscribers of site $i$ are treated as located at site $i$, so they are either entirely within reach of a powered site or not. This assumes concentrated subscriber densities.
 
@@ -183,20 +182,19 @@ To necessitate this, a few key assumptions have to made:
 
 -   Peak demand. $w_i$ is the subscriber count at site $i$ at full peak. Coverage target. At least 90% of total peak subscribers must be served during the outage.
 
-What I need: Coverage matrix to get the distances between sites.
+-   Each site has a coverage area, drawn as a polygon on the map. Two sites are considered neighbours if their coverage areas touch, and also assume a generator at one site can also cover its neighbours' subscribers. This is recorded in a table of ones and zeros, $a_{ij}$, which equals 1 when sites $i$ and $j$ are the same or neighbours, a standard device in coverage models [@churchrevelle1974]. Touching is measured as the shortest straight-line distance between the two areas, computed in metres with the `sf` package [@pebesma2018]. A small tolerance of 10 m counts areas that almost meet as touching, to allow for drawing errors. Unlike a fixed distance, this rule adapts to local site size, so a dense urban site does not reach unrealistically many neighbours.
 
-## Partial Set Covering Formulation
-
-### Sets and parameters
+### Formulation
 
 $$
 \begin{aligned}
 I &: \text{set of sites, indexed by } i, j \\
-d_{ij} &: \text{distance between sites } i \text{ and } j \text{ (km)} \\
-R &: \text{coverage perimeter (km)} \\
+P_i &: \text{coverage cell (polygon) of site } i \\
+d(P_i, P_j) &: \text{minimum distance between the coverage cells of sites } i \text{ and } j \text{ (m)} \\
+\varepsilon &= 10 \text{ m} : \text{tolerance for digitisation error, so that cells sharing a boundary are adjacent} \\
 a_{ij} &=
 \begin{cases}
-1 & \text{if } d_{ij} \le R \quad (\text{so } a_{ii} = 1) \\
+1 & \text{if } i = j \ \text{ or } \ d(P_i, P_j) \le \varepsilon \quad (\text{so } a_{ii} = 1) \\
 0 & \text{otherwise}
 \end{cases} \\
 w_i &: \text{peak unique subscribers at site } i \\
@@ -253,22 +251,34 @@ dist_matrix=as.matrix(units::set_units(dist_matrix, "km"))
 r=mean(cpt_site_ranges_gdf$perimeter)
 R=units::set_units(round(r,2),'km')
 
-neigh_mat=ifelse(dist_matrix<= R,1,0)
+n=nrow(sites)
+
+beta <- 0.95
+polys=cpt_site_ranges_subs_gdf$geometry
+cell_area  <- as.numeric(st_area(polys)) 
+dist_m <- matrix(as.numeric(st_distance(polys)), n, n)     # metres
+
+# (a) Adjacent cells: cells that touch (10 m tolerance for digitising error)
+touch = st_is_within_distance(polys, polys, dist = 10, sparse = FALSE)
+neigh_mat = matrix(as.numeric(touch), n, n);
+diag(neigh_mat)= 1
+
+#neigh_mat=ifelse(dist_matrix<= R,1,0)
 
 # matrix(neigh_mat,nrow=)
-dim(neigh_mat)
+#dim(neigh_mat)
 
  # Check if matrix is symmetrix
-isSymmetric(neigh_mat)
+#isSymmetric(neigh_mat)
 
 # sub cov matrix= diag matrix
 # A sub at site i can only access site service if a generator is at its home site or neigboring site
 
-y_mat=matrix(0,nrow=dim(neigh_mat)[1] ,ncol=dim(neigh_mat)[2])
-diag(y_mat)=1
+y_mat=diag(dim(neigh_mat)[1])#matrix(0,nrow=dim(neigh_mat)[1] ,ncol=dim(neigh_mat)[2])
+#diag(y_mat)=1
 
 # 1st matrix constraint
-constraint_1=y_mat-neigh_mat
+constraint_1=cbind(-neigh_mat, y_mat) #y_mat-neigh_mat
 dim(constraint_1)
 
 # constrint 2, vector to append at the end of const 1
@@ -276,13 +286,14 @@ dim(constraint_1)
 
 sub_coeff=st_drop_geometry(cpt_site_ranges_subs_gdf) %>% select(avg_nr_unique_subs) %>% pull()
 
-constraint_2=matrix(sub_coeff,nrow=1,ncol=dim(constraint_1)[2])
+
+constraint_2=matrix(c(rep(0, nrow(neigh_mat)), sub_coeff), nrow = 1) # covered subscribers >= beta * total#matrix(sub_coeff,nrow=1,ncol=dim(constraint_1)[2])
 
 # check dim
 #dim(rbind(constaint_1,constraint_2))
 
 # constrain values
-beta=0.9
+beta=0.96
 
 # total subs covered at full capacity
 total_subs=st_drop_geometry(cpt_site_ranges_subs_gdf)  %>% summarise(total_unique_subs=sum(avg_nr_unique_subs)) %>% pull()
@@ -299,14 +310,18 @@ rhs_2=matrix(beta*total_subs,ncol=1,nrow=1)
 
 ```{r,solve_LP, echo=F, eval=T}
 
-obj_vec=rep(1,nrow(cpt_site_ranges_subs_gdf)) # xi
+
+n=nrow(neigh_mat)
+# order of obj, xi,yi
+obj_vec=c( rep(1,nrow(neigh_mat)),rep(0, nrow(neigh_mat)) ) # xi
+
 
 
 constraint_mat_lp=rbind(constraint_1,constraint_2)
 
-my_types = rep("B",length(obj_vec)) # enforces boolean output!
-rhs_=rbind(rhs_1,rhs_2)
-dir_vec=c(rep('<=',dim(constraint_1)[1]),'>=')
+my_types = rep("B", 2 * nrow(neigh_mat)) #rep("B",length(obj_vec)) # enforces boolean output!
+rhs_=c(rep(0, n), beta * total_subs)#rbind(rhs_1,rhs_2)
+dir_vec=c(rep('<=',nrow(neigh_mat)),'>=')
 
 # Enter into solver
 
@@ -314,20 +329,218 @@ dir_vec=c(rep('<=',dim(constraint_1)[1]),'>=')
 lp_soln=Rglpk_solve_LP(obj = obj_vec, mat =constraint_mat_lp , types = my_types,dir = dir_vec, rhs = rhs_, max = FALSE) # minimization problm
 
 
-# Yay!
+
+```
+
+```{r,check,eval=T,include=F}
+# =============================================================================
+# Neighbourhood matrix: diagnose the current one, build alternatives, and see
+# how the optimal number of generators changes with the definition of "reach".
+#
+# A[i, j] = 1  if site i can be supplied by a generator placed at site j
+#               (rows = sites covered, columns = generator locations)
+#
+# Assumes (from your earlier code): sites (sf points, column atoll_site_id),
+# cpt_site_ranges_gdf (sf polygons, atoll_site_id + perimeter),
+# cpt_site_ranges_subs_gdf (avg_nr_unique_subs), neigh_mat, R, beta.
+# NOT RUN by the author - adapt object names where needed.
+# =============================================================================
+
+# # ---- 0. Put polygons, points and weights in the SAME site order ------------
+# sites=st_drop_geometry(site_gdf)
+# id    <- sites$atoll_site_id
+# polys <- cpt_site_ranges_subs_gdf[match(id, cpt_site_ranges_subs_gdf$atoll_site_id), ]
+# stopifnot(!anyNA(polys$atoll_site_id))
+# 
+# crs_m <- 32734                                   # UTM zone 34S (metres), Cape Town
+# polys <- st_make_valid(st_transform(polys, crs_m))
+# pts   <- st_transform(sites, crs_m)
+# n     <- nrow(pts)
+# 
+# # weights: adapt the join key if your subscriber table is keyed differently
+# w <- cpt_site_ranges_subs_gdf$avg_nr_unique_subs[
+#        match(id, cpt_site_ranges_subs_gdf$atoll_site_id)]
+# stopifnot(!anyNA(w), length(w) == n)
+
+beta <- 0.9
+polys=cpt_site_ranges_subs_gdf$geometry
+cell_area  <- as.numeric(st_area(polys)) 
+dist_m <- matrix(as.numeric(st_distance(polys)), n, n)     # metres
+
+# (a) Adjacent cells: cells that touch (10 m tolerance for digitising error)
+touch <- st_is_within_distance(polys, polys, dist = 10, sparse = FALSE)
+A_adj <- matrix(as.numeric(touch), n, n); diag(A_adj) <- 1
 
 
+# ---- 1. Diagnose the CURRENT radius ----------------------------------------
+                # m^2
+# cell_width <- 2 * sqrt(cell_area / pi) / 1000            # equivalent diameter, km
+# cat("R used for neighbourhoods (km)      :", as.numeric(R), "\n")
+# cat("Median cell width (km)              :", round(median(cell_width), 2), "\n")
+# cat("R / median cell width               :", round(as.numeric(R) / median(cell_width), 1), "\n")
+# cat("Mean perimeter of cells (km)        :",
+#     round(mean(as.numeric(st_length(st_cast(polys, "MULTILINESTRING")))) / 1000, 2), "\n")
+# 
+# ---- 2. Alternative neighbourhood matrices ----------------------------------
+dist_m <- matrix(as.numeric(st_distance(polys)), n, n)     # metres
 
+# (a) Adjacent cells: cells that touch (10 m tolerance for digitising error)
+touch <- st_is_within_distance(polys, polys, dist = 10, sparse = FALSE)
+A_adj <- matrix(as.numeric(touch), n, n); diag(A_adj) <- 1
 
+# (b) Two-hop: adjacent, or adjacent to an adjacent cell
+A_adj2 <- ((A_adj %*% A_adj) > 0) * 1
+
+# (c) Fixed practical radius (metres)
+A_rad <- function(R_m) { A <- (dist_m <= R_m) * 1; diag(A) <- 1; A }
+
+# (d) Each generator reaches kappa times its own cell radius
+r_j   <- sqrt(cell_area / pi)                            # metres
+A_own <- function(kappa) { A <- sweep(dist_m, 2, kappa * r_j, "<=") * 1; diag(A) <- 1; A }
+
+# (e) Your current matrix, for reference
+A_cur <- matrix(as.numeric(neigh_mat), n, n); diag(A_cur) <- 1
+
+# ---- 3. Exact LP (same model as before) -------------------------------------
+solve_cover <- function(A, w, beta){
+  n  <- nrow(A); ws <- w / sum(w)
+  res <- Rglpk_solve_LP(
+    obj   = c(rep(1, n), rep(0, n)),
+    mat   = rbind(cbind(-A, diag(n)), c(rep(0, n), ws)),
+    dir   = c(rep("<=", n), ">="),
+    rhs   = c(rep(0, n), beta),
+    types = rep("B", 2 * n), max = FALSE)
+  x <- round(res$solution[1:n])                          # generators only
+  out <- data.frame(mean_reach    = round(mean(colSums(A)), 1),
+                    generators    = sum(x),
+                    covered_share = round(sum(w[as.vector(A %*% x) >= 1]) / sum(w), 4),
+                    status        = res$status)
+  attr(out, "x") <- x                                    # chosen generator sites
+  out
+}
+
+defs <- list(
+  "Current (R = mean perimeter)" = A_cur,
+  "Adjacent cells (1-hop)"       = A_adj,
+  "Two-hop"                      = A_adj2,
+  "Radius 1 km"                  = A_rad(1000),
+  "Radius 2 km"                  = A_rad(2000),
+  "Radius 3 km"                  = A_rad(3000),
+  "Own range x 2"                = A_own(2)
+)
+
+results <- do.call(rbind, lapply(names(defs), function(nm){
+  cbind(definition = nm, solve_cover(defs[[nm]], w, beta))
+}))
+print(results, row.names = FALSE)
+
+# ---- 4. Where do the chosen generators sit under one definition? -----------
+x_adj <- attr(solve_cover(A_adj, w, beta), "x")   # change A_adj to the definition you pick
+polys$gen <- x_adj   
+
+# 1 = gets a generator; use this to colour your map
+
+#x_adj
+```
+
+```{r,lp_res_summary}
+
+#Summary of LP reusults
+site_df <- st_drop_geometry(cpt_site_ranges_subs_gdf)
+
+A_adj=neigh_mat
+n <- nrow(A_adj)
+A <- matrix(as.numeric(A_adj), nrow = n, ncol = n)   # A[i, j] = 1: site i reached from j
+w <- as.numeric(site_df$avg_nr_unique_subs)
+ids <- if ("atoll_site_id" %in% names(site_df)) site_df$atoll_site_id else seq_len(n)
+
+if (!exists("beta")) beta <- 0.90
+stopifnot(length(w) == n, !anyNA(w), length(lp_soln$solution) >= n)
+
+# ---- 2. Solution -------------------------------------------------------------
+x       <- round(lp_soln$solution[1:n])      # generators ONLY (not the y flags)
+gen_idx <- which(x == 1)
+
+n_cover <- as.vector(A %*% x)                # generators in each site's neighbourhood
+covered <- n_cover >= 1                      # site is supported
+
+# ---- 3. Key quantities --------------------------------------------------------
+total_subs   <- sum(w)
+covered_subs <- sum(w[covered])
+G            <- sum(x)
+
+fmt_pct <- function(p) sprintf("%.1f%%", 100 * p)
+fmt_num <- function(v) format(round(v), big.mark = ",", scientific = FALSE)
+
+# ---- 4. Summary table ---------------------------------------------------------
+summary_tbl <- data.frame(
+  Metric = c(
+    "Solver status (0 = optimal)",
+    "Optimal number of generators",
+    "Generators as % of all sites",
+    "Subscribers covered",
+    "Coverage target (beta)",
+    "Margin above target",
+    "Sites supported",
+    "  of which hosting a generator",
+    "  of which supported via a neighbour",
+    "Sites not supported",
+    "Subscribers not covered",
+    "Average sites supported per generator",
+    "Average subscribers covered per generator",
+    "Sites reachable by 2+ generators (redundancy)",
+    "Subscribers at generator sites (for reference)"
+  ),
+  Value = c(
+    as.character(lp_soln$status),
+    as.character(G),
+    fmt_pct(G / n),
+    sprintf("%s of %s (%s)", fmt_num(covered_subs), fmt_num(total_subs),
+            fmt_pct(covered_subs / total_subs)),
+    fmt_pct(beta),
+    sprintf("%.2f pp", 100 * (covered_subs / total_subs - beta)),
+    sprintf("%d of %d (%s)", sum(covered), n, fmt_pct(mean(covered))),
+    as.character(G),
+    as.character(sum(covered & x == 0)),
+    as.character(sum(!covered)),
+    sprintf("%s (%s)", fmt_num(total_subs - covered_subs),
+            fmt_pct(1 - covered_subs / total_subs)),
+    sprintf("%.1f", sum(covered) / G),
+    fmt_num(covered_subs / G),
+    sprintf("%d (%s of supported sites)", sum(n_cover >= 2),
+            fmt_pct(sum(n_cover >= 2) / sum(covered))),
+    fmt_pct(sum(w[gen_idx]) / total_subs)
+  )
+)
+
+kable(summary_tbl, align = c("l", "r"), col.names = c("Metric", "Value"),
+      caption = "Optimal generator placement: summary of results")
+
+# ---- 5. Table of selected generator sites --------------------------------------
+reach_sites <- colSums(A)[gen_idx]                          # sites it can reach (incl. own)
+reach_subs  <- as.vector(crossprod(A, w))[gen_idx]          # subscribers at those sites
+sole_subs   <- sapply(gen_idx, function(j) sum(w[A[, j] == 1 & n_cover == 1]))
+                                                            # covered by this generator ONLY
+
+# gen_tbl <- data.frame(
+#   Site                         = ids[gen_idx],
+#   `Subscribers at site`        = fmt_num(w[gen_idx]),
+#   `Sites in reach`             = reach_sites,
+#   `Subscribers in reach`       = fmt_num(reach_subs),
+#   `Subscribers covered only by this generator` = fmt_num(sole_subs),
+#   check.names = FALSE
+# )[order(-reach_subs), ]
+# 
+# kable(gen_tbl, row.names = FALSE, align = c("l", "r", "r", "r", "r"),
+#       caption = "Selected generator sites, ordered by subscribers in reach")
 ```
 
 ```{r,soln_plot,eval=T,echo=F}
 
 # get indicies
-
-cpt_site_ranges_subs_gdf$gets_gen=lp_soln$solution
-
-
+# sites thay get generators
+x_adj <- attr(solve_cover(A_adj, w, beta), "x")
+cpt_site_ranges_subs_gdf$gets_gen=x_adj
 
 # Now map whic sites got a generator
 leaflet(cpt_site_ranges_subs_gdf) |> 
@@ -354,21 +567,27 @@ leaflet(cpt_site_ranges_subs_gdf) |>
   )
 ```
 
+**Key Observation from LP formulation\
+**The linear programme gives an exact answer what the fewest generators needed so that at least 90% of subscribers sit at a site that either hosts a generator or touches a site that does.\
+Its core strength is that the optimum is provably the best possible for that (albeit simple) formulation, and the used the neighbourhood definition. However, it has some limitations
+
+-   It does not cater for the importance of or ranking of the site in terms of its revenue metrics.
+
+-   The model is static: it assumes every supported site can draw on its generator at the same time, and it ignores load-shedding schedules, generator capacity and the randomness of the stage
+
+-   The single objective also hides a trade-off: it minimises the number of generators and is indifferent to which 10% of subscribers are left uncovered, so the multi-objective view shows whether those uncovered sites are disproportionately high-revenue sites.\
+
 # Section 2: Deterministic MOLP Formulation- Incorporating Revenue-led Site Importance
 
 Naturally, the choice to deploy a generator at a site is not only determined by cost alone, but by the relative importance of the site in terms of its traffic flows and revenue. Thus an additional objective to the problem would be to minimize (or at least preserve) aggregate peak traffic flow loss across sites and thus minimize (at least preserve) peak revenue loss at these sites.
 
-For simplicity's sake (and available data), we assume the following, in addition to the key assumptions in Section 1:
+For simplicity's sake (and available data), assume the following, in addition to the key assumptions in Section 1:
 
 -   Revenue at a site,$Rev_i$, is a monotonically increasing function of traffic. Thus, a relatively high-revenue site implies that a high-traffic site.
 
--   As such, only the revenue objective is added to the initial generator minimization problem. We aim to minimize the loss of revenue at these sites
-
--   The average monthly site revenues are generated at peak times across sites. The sum of these across sites would ideally be preserved or maximised.
+-   As such, only the revenue objective is added to the initial generator minimization problem, with the aim to minimize the loss of revenue at these sites. The average monthly site revenues are generated at peak times across sites. The sum of these across sites would ideally be preserved or maximised.
 
 -   **Revenue follows the subscriber:** The traffic/revenue that would be ordinarily attributed to a site before loadshedding, can be "absorbed" into neighboring sites by virtue of the subscribers still being able to access neigbouring sites that have generators as assumed in Section 1.
-
--   Site rankings are derived from the normalized revenue of each site. Thus the goal would be minimize the sum of ranks(?)
 
 -   We initially assume that revenue preservation and generator cost minimization are weighted equally: $w1=w2=0.5$
 
@@ -376,24 +595,17 @@ For simplicity's sake (and available data), we assume the following, in addition
 
 Let $R_i$ denote the revenue of network site $i \in I$. Normalise each KPI to $[0,1]$:
 
-$$
-\tilde{Rev}_i = \frac{Rev_i - \min_k Rev_k}{\max_k Rev_k - \min_k Rev_k},
+$$\{r}_i = \frac{Rev_i - \min_k Rev_k}{\max_k Rev_k - \min_k Rev_k},
 \qquad
 $$
 
-The composite importance score of site $i$ is
-
-$$
-s_i = rank(R_{i})\
-st.\max(s_i)= \sum(x_i) 
-$$
+Variable Definitions:
 
 $$
 \begin{aligned}
 r_i &: \text{average monthly peak revenue at site } i \\
-\rho_i &= r_i \Big/ \textstyle\sum_{k \in I} r_k : \text{normalized revenue (importance weight)} \\
 G &: \text{target (budget) number of generators} \\
-\gamma &: \text{target fraction of total peak revenue preserved} \\
+\gamma=0.95 &: \text{target fraction of total peak revenue preserved} \\
 \omega_1, \omega_2 &: \text{goal weights}, \; \omega_1 + \omega_2 = 1 \\
 d_G^{+} &\ge 0 : \text{generators deployed above target } G \\
 d_r^{-} &\ge 0 : \text{shortfall of preserved revenue below target } \gamma \textstyle\sum_i r_i
@@ -430,7 +642,7 @@ $$
 x_j \in \{0,1\}, \quad y_i \in [0,1], \quad d_G^{+}, d_r^{-} \ge 0
 $$ {#eq-gp-domain}
 
-Where $G$ is the initial optimal solution from the LP formulation in Section 1.
+Where $G$ is the **initial optimal solution** from the **LP formulation in Section 1.**
 
 ```{r,avg_rev_distr,eval=T,echo=F}
 
@@ -483,11 +695,84 @@ leaflet(cpt_site_ranges_rev_gdf) |>
 
 ```
 
-For the above simulation the goal constrains are defined as:\
+```{r,lp_soln_site_rank,eval=T,echo=F}
+
+site_rev_ranking=st_drop_geometry(cpt_site_ranges_rev_gdf) %>% arrange(desc(monthly_rev)) %>% mutate(rev_ranking=row_number()) %>% select(atoll_site_id,rev_ranking)
+ # Join sites to rev
+site_df <- st_drop_geometry(cpt_site_ranges_subs_gdf)
+n   <- nrow(A_adj)
+A   <- matrix(as.numeric(A_adj), nrow = n, ncol = n)
+ids <- site_df$atoll_site_id
+x   <- round(lp_soln$solution[1:n])               # generators only
+
+rev_df <- st_drop_geometry(cpt_site_ranges_rev_gdf) %>%
+  select(atoll_site_id, monthly_rev) %>%
+  distinct(atoll_site_id, .keep_all = TRUE)
+
+N_ranked <- nrow(site_rev_ranking)
+
+# Site Rev
+all_sites <- tibble(
+  atoll_site_id = ids,
+  generator     = x == 1,
+  supported     = as.vector(A %*% x) >= 1
+) %>%
+  left_join(site_rev_ranking, by = "atoll_site_id") %>%
+  left_join(rev_df,           by = "atoll_site_id")
+
+if (anyNA(all_sites$rev_ranking[all_sites$generator])) {
+  warning("Some chosen sites have no revenue ranking: check atoll_site_id matching.")
+}
+
+total_rev <- sum(all_sites$monthly_rev, na.rm = TRUE)
+
+# LP Site Rankings
+chosen <- all_sites %>%
+  filter(generator) %>%
+  arrange(rev_ranking) %>%
+  mutate(percentile    = rev_ranking / N_ranked,         # 0 = top, 1 = bottom
+         revenue_share = monthly_rev / total_rev)
+
+# ---- 5. Summary of the rankings -------------------------------------------------
+fmt_pct <- function(p) sprintf("%.1f%%", 100 * p)
+
+rank_summary <- data.frame(
+  Metric = c(
+    "Generators deployed",
+    "Best rank among chosen sites (1 = highest revenue)",
+    "Median rank of chosen sites",
+    "Worst rank among chosen sites",
+    "Median rank if sites were chosen at random (reference)",
+    "Chosen sites in the top 10% by revenue",
+    "Chosen sites in the top 25% by revenue",
+    "Revenue at generator sites (% of network total)",
+    "Revenue at supported sites (% of network total)",
+    "Revenue at unsupported sites (% of network total)"
+  ),
+  Value = c(
+    as.character(nrow(chosen)),
+    as.character(min(chosen$rev_ranking, na.rm = TRUE)),
+    as.character(median(chosen$rev_ranking, na.rm = TRUE)),
+    as.character(max(chosen$rev_ranking, na.rm = TRUE)),
+    as.character(round((N_ranked + 1) / 2)),
+    sprintf("%d of %d", sum(chosen$percentile <= 0.10, na.rm = TRUE), nrow(chosen)),
+    sprintf("%d of %d", sum(chosen$percentile <= 0.25, na.rm = TRUE), nrow(chosen)),
+    fmt_pct(sum(chosen$monthly_rev, na.rm = TRUE) / total_rev),
+    fmt_pct(sum(all_sites$monthly_rev[all_sites$supported], na.rm = TRUE) / total_rev),
+    fmt_pct(sum(all_sites$monthly_rev[!all_sites$supported], na.rm = TRUE) / total_rev)
+  )
+)
+
+kable(rank_summary, align = c("l", "r"), col.names = c("Metric", "Value"),
+      caption = "Revenue ranking of LP-selected generator sites")
+
+
+
+```
+
+None of the sites chosen by the LP model are in the 10 ten highest revenue sites, with only 3 in the top 10 highest revenue site segments
 
 ```{r,goal_set_up, eval=T, echo=FALSE,include=F}
-
-#
 w1=0.5
 w2=0.5
 gamma=0.95 # 1-gamma=revenue loss percentage, gamma is the lease rev that we want to preserve
@@ -506,11 +791,12 @@ G2=gamma*tot_rev
 # Let G1 be the optimum number of generators that were determined from Section 1
 
 G1=lp_soln$optimum # total number of generators
-G1
+
+
 
 ```
 
-#### Archimedian Set up and Solution
+#### Weighted Archimedian Solution
 
 ```{r,mogp_set_up_arch, eval=T,echo=F ,include=F}
 
@@ -545,10 +831,10 @@ g2_constraint=cbind(0,dr_coeff_g2_2,xn_coeff_g2_2,rev_coeff_g2_2);dim(g2_constra
 
 
 # Hard Constraints from Section 1, extended to include yi and dg and dr
-dg_coeff_hrd_const=matrix(0,nrow=dim(neigh_mat)[1],ncol=1)
-dr_coeff_hrd_const=matrix(0,nrow=dim(neigh_mat)[1],ncol=1)
+dg_coeff_hrd_const=matrix(0,nrow=dim(A_adj)[1],ncol=1)
+dr_coeff_hrd_const=matrix(0,nrow=dim(A_adj)[1],ncol=1)
 
-a1=cbind(dg_coeff_hrd_const,dr_coeff_hrd_const,-1*neigh_mat,y_mat) # expanded hard constraint matrix 1
+a1=cbind(dg_coeff_hrd_const,dr_coeff_hrd_const,-1*A_adj,y_mat) # expanded hard constraint matrix 1
 
 # dim(a1)[2];length(obj_vec_ac)cbind(rep(0,length(xn_coeff)),dg_coeff_hrd_const,dr_coeff_hrd_const,-1*neigh_mat,y_mat)
 
@@ -573,6 +859,7 @@ a2=cbind(dg_coeff_hrd_const2,dr_coeff_hrd_const2,xi_coeff_hrd_const2,yi_coeff_hr
 ```{r,mogp_arch_soln, eval=T,echo=F ,include=F}
 
 
+# order of obj (dg,dr,x1,x2,....,xn, y1,y2,....yn) yi is the revenue that is still preserved at a site if it either got a generator OR that ,xi s ite
 obj_vec_ac=c(dg_coeff,dr_coeff,xn_coeff,yn_coeff)
 
 constraint_mat_arc=rbind(g1_constraints,g2_constraint,a1,a2); dim(constraint_mat_arc)
@@ -595,55 +882,324 @@ mogp_arc_soln=Rglpk_solve_LP(obj = obj_vec_ac, mat =constraint_mat_arc , types =
  mogp_arc_soln # Interprete tomorrow
 ```
 
-#### Chebyshev Formulation
+```{r,mogp_arc_soln_summ,echo=F}
 
-$$
-\lambda \ge 0 : \text{maximum weighted normalized deviation across the goals}
-$$
+# ---- 1. Inputs aligned to A_adj ------------------------------------------------
 
-### Model
+site_rev_ranking=st_drop_geometry(cpt_site_ranges_rev_gdf) %>% arrange(desc(monthly_rev)) %>% mutate(rev_ranking=row_number()) %>% select(atoll_site_id,rev_ranking)
 
-$$
-\min max(w_1d^+_G,w_2d^-_r)=D
-$$ {#eq-ch-obj}
+site_df <- st_drop_geometry(cpt_site_ranges_subs_gdf)
+n   <- nrow(A_adj)
+A   <- matrix(as.numeric(A_adj), nrow = n, ncol = n)
+ids <- site_df$atoll_site_id
+w   <- as.numeric(site_df$avg_nr_unique_subs)
 
-subject to the original constraints
+rev_df <- st_drop_geometry(cpt_site_ranges_rev_gdf) %>%
+  select(atoll_site_id, monthly_rev) %>%
+  distinct(atoll_site_id, .keep_all = TRUE)
 
-$$
-y_i \le \sum_{j \in I} a_{ij}\, x_j \qquad \forall i \in I
-$$ {#eq-ch-cover}
+r  <- rev_df$monthly_rev[match(ids, rev_df$atoll_site_id)]
+rk <- site_rev_ranking$rev_ranking[match(ids, site_rev_ranking$atoll_site_id)]
+N_ranked <- nrow(site_rev_ranking)
 
-$$
-\sum_{i \in I} w_i\, y_i \ge \beta \sum_{i \in I} w_i
-$$ {#eq-ch-target}
+if (anyNA(r) || anyNA(rk)) warning("Some sites have no revenue or ranking: check atoll_site_id matching.")
+stopifnot(!anyNA(w))
 
-the goal constraints
+# gamma is also a base R function, so only use it if you have defined it as a number
+gamma_goal <- if (is.numeric(gamma)) gamma else NA_real_
 
-$$
-\sum_{j \in I} x_j - d_G^{+} \le G
-$$ {#eq-ch-goal-gen}
+# ---- 2. Decode the two solutions ------------------------------------------------
+x_base <- round(lp_soln$solution[1:n])                  # single-objective LP
 
-$$
-\sum_{i \in I} r_i\, y_i + d_r^{-} \ge \gamma \sum_{i \in I} r_i
-$$ {#eq-ch-goal-rev}
+sol <- mogp_arc_soln$solution
+if (length(sol) != 2 * n + 2) {
+  stop("Solution length is ", length(sol), " but 2n + 2 = ", 2 * n + 2,
+       ": check the variable order or the number of sites.")
+}
+d_G_plus  <- sol[1]
+d_r_minus <- sol[2]
+x_goal    <- round(sol[3:(n + 2)])
+y_goal    <- sol[(n + 3):(2 * n + 2)]
 
-the Chebyshev (minimax) constraints
+cat("Solver status (0 = optimal):", mogp_arc_soln$status, "\n")
+cat("Any fractional y values    :", any(y_goal > 1e-6 & y_goal < 1 - 1e-6), "\n")
 
-$$
-\omega_1 \frac{d_G^{+}}{G} \le D
-$$ {#eq-ch-max-gen}
+# ---- 3. Score a placement the same way for both solutions ----------------------
+score <- function(x){
+  covered <- as.vector(A %*% x) >= 1
+  chosen  <- which(x == 1)
+  c(generators       = sum(x),
+    subs_covered     = sum(w[covered]) / sum(w),
+    revenue_covered  = sum(r[covered], na.rm = TRUE) / sum(r, na.rm = TRUE),
+    sites_supported  = mean(covered),
+    median_rank      = median(rk[chosen], na.rm = TRUE),
+    best_rank        = min(rk[chosen], na.rm = TRUE),
+    top25_count      = sum(rk[chosen] <= 0.25 * N_ranked, na.rm = TRUE))
+}
 
-$$
-\omega_2 \frac{d_r^{-}}{\gamma \sum_{i \in I} r_i} \le D
-$$ {#eq-ch-max-rev}
+s_base <- score(x_base)
+s_goal <- score(x_goal)
 
-and the domain constraints
+fmt_pct <- function(p) sprintf("%.1f%%", 100 * p)
 
-$$
-x_j \in \{0,1\}, \quad y_i \in [0,1], \quad d_G^{+}, d_r^{-},D \ge 0
-$$ {#eq-ch-domain}
+# ---- 4. Table 1: comparison of the two solutions ---------------------------------
+compare_tbl <- data.frame(
+  Metric = c("Generators deployed",
+             "Subscribers covered",
+             "Revenue covered",
+             "Sites supported",
+             "Median revenue rank of generator sites",
+             "Best revenue rank among generator sites",
+             sprintf("Generator sites in the top 25%% by revenue (of %d ranked)", N_ranked)),
+  `Single-objective LP` = c(s_base["generators"],
+                            fmt_pct(s_base["subs_covered"]),
+                            fmt_pct(s_base["revenue_covered"]),
+                            fmt_pct(s_base["sites_supported"]),
+                            s_base["median_rank"],
+                            s_base["best_rank"],
+                            s_base["top25_count"]),
+  `Goal programme`      = c(s_goal["generators"],
+                            fmt_pct(s_goal["subs_covered"]),
+                            fmt_pct(s_goal["revenue_covered"]),
+                            fmt_pct(s_goal["sites_supported"]),
+                            s_goal["median_rank"],
+                            s_goal["best_rank"],
+                            s_goal["top25_count"]),
+  check.names = FALSE
+)
 
-```{r,cb_set_up,eval=T,echo=F}
+kable(compare_tbl, align = c("l", "r", "r"),
+      caption = "Single-objective LP versus weighted goal programme")
+
+# ---- 5. Table 2: goal deviations and trade-off --------------------------------------
+extra_gens <- sum(x_goal) - sum(x_base)
+rev_gain_pp <- 100 * (s_goal["revenue_covered"] - s_base["revenue_covered"])
+both     <- sum(x_base == 1 & x_goal == 1)
+added    <- sum(x_base == 0 & x_goal == 1)
+dropped  <- sum(x_base == 1 & x_goal == 0)
+
+dev_tbl <- data.frame(
+  Quantity = c("Generator goal G (single-objective optimum)",
+               "d_G+  (generators above G)",
+               "Generators deployed by goal programme",
+               "Revenue goal (gamma)",
+               "Revenue covered by goal programme",
+               "d_r-  (revenue shortfall against the goal)",
+               "Revenue covered gained over the LP (percentage points)",
+               "Revenue gained per extra generator (percentage points)",
+               "Generator sites in both solutions",
+               "Sites added by the goal programme",
+               "Sites dropped from the LP solution",
+               "Objective value"),
+  Value = c(sum(x_base),
+            round(d_G_plus, 3),
+            sum(x_goal),
+            if (is.na(gamma_goal)) "n/a" else fmt_pct(gamma_goal),
+            fmt_pct(s_goal["revenue_covered"]),
+            format(round(d_r_minus), big.mark = ","),
+            sprintf("%.2f", rev_gain_pp),
+            if (extra_gens == 0) "n/a" else sprintf("%.2f", rev_gain_pp / extra_gens),
+            both, added, dropped,
+            sprintf("%.4f", mogp_arc_soln$optimum))
+)
+
+kable(dev_tbl, align = c("l", "r"),
+      caption = "Goal deviations and trade-off")
+
+# ---- 6. Table 3: the chosen sites with revenue rank ----------------------------------
+total_rev <- sum(r, na.rm = TRUE)
+
+chosen_tbl <- tibble(atoll_site_id = ids,
+                     goal = x_goal == 1,
+                     base = x_base == 1,
+                     rev_ranking = rk,
+                     monthly_rev = r) %>%
+  filter(goal) %>%
+  arrange(rev_ranking) %>%
+  transmute(Site                       = atoll_site_id,
+            `Revenue rank`             = sprintf("%d of %d", rev_ranking, N_ranked),
+            `Monthly revenue`          = format(round(monthly_rev), big.mark = ","),
+            `Share of network revenue` = fmt_pct(monthly_rev / total_rev),
+            `In single-objective LP?`  = ifelse(base, "Yes", "No (added)"))
+
+kable(chosen_tbl, align = c("l", "r", "r", "r", "l"),
+      caption = "Generator sites chosen by the goal programme, ordered by revenue rank")
+```
+
+**Sensitivity Analysis**
+
+Vary the goal weights to see how the model solution and accompanying metrics change.
+
+```{r}
+# =============================================================================
+# Sensitivity of the weighted Archimedean goal programme to its weights
+#
+# Objective:  w1 * d_G+ / G1  +  w2 * d_r- / G2        with  w2 = 1 - w1
+# Only the two deviation coefficients change between runs; the constraint
+# matrix, directions, right-hand side and variable types are reused as is.
+#
+# Variable order in the solver:  (d_G+, d_r-, x_1..x_n, y_1..y_n)
+#
+# Assumes in the session (all from your existing setup):
+#   constraint_mat_arc, dir_vec, rhs_, my_types_ar, G1, G2
+#   A_adj, cpt_site_ranges_subs_gdf, rev_df, site_rev_ranking
+#
+# NOT RUN by the author - adapt names where needed.
+# In Quarto, put each plot / kable() call as the last line of its own chunk.
+# =============================================================================
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(Rglpk)
+library(knitr)
+library(sf)
+
+# ---- 0. Inputs aligned to A_adj (skip any that you already have) -------------
+n       <- nrow(A_adj)
+A       <- matrix(as.numeric(A_adj), nrow = n, ncol = n)
+site_df <- st_drop_geometry(cpt_site_ranges_subs_gdf)
+ids     <- site_df$atoll_site_id
+w       <- as.numeric(site_df$avg_nr_unique_subs)
+r       <- rev_df$monthly_rev[match(ids, rev_df$atoll_site_id)]
+rk      <- site_rev_ranking$rev_ranking[match(ids, site_rev_ranking$atoll_site_id)]
+N_ranked <- nrow(site_rev_ranking)
+
+# ---- 1. Settings ----------------------------------------------------------------
+# Tiny cost on each x so that, among solutions that tie on the two goals, the one
+# with the FEWEST generators is returned. Set to 0 to reproduce your model exactly.
+eps_x <- 1e-5
+
+# Weight grid. The ends (w1 = 0 or 1) are left out on purpose: with one weight at
+# zero the other goal is ignored and the solution is arbitrary.
+w1_grid <- c(0.25,0.5,0.75)#sort(unique(c(seq(0, 0.95, by = 0.25), 0.5)))
+
+# ---- 2. Solve once for a given w1 ----------------------------------------------------
+run_mogp <- function(w1){
+  w2  <- 1 - w1
+  obj <- c(w1 / G1, w2 / G2, rep(eps_x, n), rep(0, n))
+
+  res <- Rglpk_solve_LP(obj = obj, mat = constraint_mat_arc, dir = dir_vec,
+                        rhs = as.numeric(rhs_), types = my_types_ar, max = FALSE)
+
+  if (res$status != 0) {
+    warning(sprintf("w1 = %.2f: solver status %s", w1, res$status))
+    return(list(row = data.frame(w1 = w1, w2 = w2, status = res$status),
+                x = rep(NA_real_, n)))
+  }
+
+  sol     <- res$solution
+  x       <- round(sol[3:(n + 2)])                    # generators only
+  covered <- as.vector(A %*% x) >= 1
+  chosen  <- which(x == 1)
+
+  list(
+    row = data.frame(
+      w1 = w1, w2 = w2, status = res$status,
+      generators      = sum(x),
+      d_G_plus        = sol[1],
+      d_r_minus       = sol[2],
+      subs_covered    = sum(w[covered]) / sum(w),
+      revenue_covered = sum(r[covered], na.rm = TRUE) / sum(r, na.rm = TRUE),
+      sites_supported = mean(covered),
+      median_rank     = median(rk[chosen], na.rm = TRUE),
+      mean_rank       = mean(rk[chosen], na.rm = TRUE),
+      top25_count     = sum(rk[chosen] <= 0.25 * N_ranked, na.rm = TRUE)
+    ),
+    x = x
+  )
+}
+
+# ---- 3. Sweep ------------------------------------------------------------------------
+runs    <- lapply(w1_grid, run_mogp)
+results <- bind_rows(lapply(runs, `[[`, "row"))
+X_mat   <- do.call(rbind, lapply(runs, `[[`, "x"))      # rows = weights, columns = sites
+
+ok <- results$status == 0
+
+# ---- 4. Results table ------------------------------------------------------------------
+results_tbl <- results %>%
+  filter(status == 0) %>%
+  transmute(`w1`                  = sprintf("%.2f", w1),
+            `w2`                  = sprintf("%.2f", w2),
+            `Generators`          = generators,
+            `Extra over G`        = round(d_G_plus),
+            `Subscribers covered` = sprintf("%.1f%%", 100 * subs_covered),
+            `Revenue covered`     = sprintf("%.1f%%", 100 * revenue_covered),
+            `Sites supported`     = sprintf("%.1f%%", 100 * sites_supported),
+            `Median revenue rank` = median_rank,
+            `Sites in top 25%`    = top25_count)
+
+kable(results_tbl, align = "r",
+      caption = "Goal programme results across weight settings")
+
+# ---- 5. Plot 1: each metric against the weights -------------------------------------------
+metric_levels <- c("Generators deployed", "Revenue covered (%)",
+                   "Subscribers covered (%)", "Sites supported (%)",
+                   "Median revenue rank of generator sites",
+                   "Generator sites in top 25% by revenue")
+
+long <- results %>%
+  filter(status == 0) %>%
+  transmute(w1,
+            `Generators deployed`                      = generators,
+            `Revenue covered (%)`                      = 100 * revenue_covered,
+            `Subscribers covered (%)`                  = 100 * subs_covered,
+            `Sites supported (%)`                      = 100 * sites_supported,
+            `Median revenue rank of generator sites`   = median_rank,
+            `Generator sites in top 25% by revenue`    = top25_count) %>%
+  pivot_longer(-w1, names_to = "metric", values_to = "value") %>%
+  mutate(metric = factor(metric, levels = metric_levels))
+
+ggplot(long, aes(x = w1, y = value)) +
+  geom_vline(xintercept = 0.5, linetype = "dashed", colour = "grey60") +
+  geom_line(colour = "steelblue") +
+  geom_point(colour = "steelblue") +
+  facet_wrap(~ metric, scales = "free_y", ncol = 2) +
+  scale_x_continuous(sec.axis = sec_axis(~ 1 - ., name = "w2 (weight on revenue goal)")) +
+  labs(x = "w1 (weight on generator goal)", y = NULL,
+       title = "How each outcome changes with the goal weights",
+       subtitle = "Dashed line: original equal weights (0.5, 0.5)") +
+  theme_minimal()
+
+# ---- 6. Plot 2: the trade-off frontier ---------------------------------------------------------
+ggplot(filter(results, status == 0),
+       aes(x = generators, y = 100 * revenue_covered, colour = w1)) +
+  geom_path(colour = "grey75") +
+  geom_point(size = 3) +
+  geom_text(aes(label = sprintf("%.2f", w1)), vjust = -0.9, size = 3, check_overlap = TRUE) +
+  scale_colour_viridis_c(name = "w1") +
+  labs(x = "Generators deployed", y = "Revenue covered (%)",
+       title = "Trade-off between generators and revenue covered",
+       subtitle = "Labels show w1; w2 = 1 - w1") +
+  theme_minimal()
+
+# ---- 7. Plot 3: which sites are chosen at each weight -------------------------------------------
+ever <- which(colSums(X_mat == 1, na.rm = TRUE) > 0)       # sites chosen at least once
+cat("Sites chosen in at least one run:", length(ever), "\n")
+cat("Sites chosen in EVERY run       :",
+    sum(colSums(X_mat == 1, na.rm = TRUE) == sum(ok)), "\n")
+
+tile_df <- data.frame(
+  w1     = rep(w1_grid, times = length(ever)),
+  site   = rep(ids[ever], each = length(w1_grid)),
+  rank   = rep(rk[ever],  each = length(w1_grid)),
+  chosen = as.vector(X_mat[, ever])
+) %>%
+  filter(!is.na(chosen)) %>%
+  mutate(site = factor(site, levels = ids[ever][order(rk[ever])]),
+         w1   = factor(sprintf("%.2f", w1)))
+
+ggplot(tile_df, aes(x = w1, y = site, fill = factor(chosen))) +
+  geom_tile(colour = "white") +
+  scale_fill_manual(values = c("0" = "grey92", "1" = "steelblue"),
+                    labels = c("No generator", "Generator"), name = NULL) +
+  labs(x = "w1 (weight on generator goal)", y = "Site, ordered by revenue rank (top = highest)",
+       title = "Generator sites across weight settings") +
+  theme_minimal() +
+  theme(axis.text.y = element_text(size = 5))
+```
+
+```{r,cb_set_up,eval=F,echo=F,include=FALSE}
 
 # order of obj (D,dg,dr,x1,x2,....,xn, y1,y2,....yn) yi is the revenue that is still preserved at a site if it either got a generator OR that ,xi s ite
 D_coeff=1
@@ -791,7 +1347,7 @@ $$
 g_2(\boldsymbol{\mu}) = \sum_{j \in I} \min\Big\{0,\; 1 - \sum_{i \in I} a_{ij} \mu_i\Big\}
 + \min_{\mathbf{y} \in \{0,1\}^{I}} \Big\{ \sum_{i \in I} \mu_i y_i \;:\; \sum_{i \in I} w_i y_i \ge \beta W \Big\}
 \;\le\; z^{*}.
-$$
+$$\
 
 The problem separates into independent decisions on $x_j$ and a knapsack-cover problem in $y$. Maximise $g_2$ over $\boldsymbol{\mu} \ge 0$ by subgradient steps, giving a lower bound.
 
@@ -825,20 +1381,34 @@ set.seed(100)   # for repeatability
 # 1. Data  (REPLACE THIS BLOCK WITH YOUR OWN)
 #    A : n x n 0/1 coverage matrix, A[i, j] = 1 if site i is in the coverage
 #        polygon of a generator at j (set the diagonal to 1)
-#    w : weight of each site (area, population, importance score, ...)
-# -----------------------------------------------------------------------------
-n   <- 60
-pts <- cbind(runif(n), runif(n))
-A   <- (as.matrix(dist(pts)) <= 0.22) * 1
-diag(A) <- 1
-w   <- rep(1, n)
 
-beta   <- 0.90                 # required covered fraction
+# site_imp=st_drop_geometry(cpt_site_ranges_rev_gdf)
+# site_imp$site_imp_weigt=site_imp$rev_norm/sum(site_imp$rev_norm)
+#site_imp %>% arrange(desc(site_imp_weigt))
+
+# A=neigh_mat
+# dim(A)
+# w= sub_coeff # vectore of site importances
+# n   <- dim(neigh_mat)[1]
+# 
+# beta   <- 0.9              # required covered fraction for subscribers
+# W      <- sum(w)
+# target <- beta * W             # (use ceiling(beta * W) if weights are integers)
+# 
+# # Penalty weight. lambda > 1 / min(w) makes every minimiser of F feasible,
+# # because covering one uncovered site then always pays for the generator.
+# lambda <- 2 / min(w[w > 0])
+
+
+A    = A_adj#neigh_mat          # same matrix the LP used
+diag(A) = 1
+w    = sub_coeff          # same weights the LP used
+beta = 0.9                # same target the LP used (the SA run earlier used 0.95)
+n    = nrow(A)
+stopifnot(length(w) == n, all(A %in% c(0, 1)))
+
 W      <- sum(w)
-target <- beta * W             # (use ceiling(beta * W) if weights are integers)
-
-# Penalty weight. lambda > 1 / min(w) makes every minimiser of F feasible,
-# because covering one uncovered site then always pays for the generator.
+target <- beta * W
 lambda <- 2 / min(w[w > 0])
 
 # -----------------------------------------------------------------------------
@@ -848,6 +1418,8 @@ covered_weight <- function(x){
   covered <- as.vector(A %*% x) >= 1
   sum(w[covered])
 }
+
+covered_weight(rbinom(n, 1, 0.8))
 
 evaluate_x <- function(x){
   shortfall <- max(0, target - covered_weight(x))
@@ -864,12 +1436,13 @@ is_feasible <- function(x){
 #    from a greedy solution or from all sites (always feasible).
 # -----------------------------------------------------------------------------
 get_initial_x <- function(n){
-  rbinom(n, 1, 0.5)
+  rbinom(n, 1, 0.8)
 }
 
 # -----------------------------------------------------------------------------
 # 4. Perturbation: flip one site, or swap a placed and an unplaced generator
 # -----------------------------------------------------------------------------
+# x is our candidate soln at current iteration
 perturb_x <- function(x){
   ones  <- which(x == 1)
   zeros <- which(x == 0)
@@ -913,9 +1486,9 @@ repair_x <- function(x){
 # -----------------------------------------------------------------------------
 start_temp  <- 5
 temp_factor <- 0.9995
-n_iter      <- 20000
+n_iter      <- 50000
 
-cur_x  <- get_initial_x(n)
+cur_x  <- get_initial_x(n);sum(get_initial_x(n))
 cur_fx <- evaluate_x(cur_x)
 
 # results (pre-allocated, as storing every solution gets slow for large n)
@@ -966,7 +1539,7 @@ if(is.null(best_x)){
 # -----------------------------------------------------------------------------
 # 7. Results
 # -----------------------------------------------------------------------------
-best_x <- repair_x(best_x)
+#best_x <- repair_x(best_x)
 
 cat("Generators placed       :", sum(best_x), "\n")
 cat("Covered weight fraction :", round(covered_weight(best_x) / W, 4),
@@ -1078,18 +1651,27 @@ site_ls_schedule=left_join(site_block_id_loc,load_shedding_schedule_long,by= c('
 
 total_site_cnt=st_drop_geometry(site_ls_schedule) %>% summarise(n_distinct(atoll_site_id)) %>% pull()
 
-freq_sites_affected=st_drop_geometry(site_ls_schedule) %>% group_by(stage,day_of_month,start_hour,end_hour,duration) %>% 
- summarise(num_sites_affected = n_distinct(atoll_site_id)) %>% 
-  mutate(percentage_affected=num_sites_affected/total_site_cnt)
+freq_sites_affected=st_drop_geometry(site_ls_schedule) 
+ #  group_by(stage,day_of_month,start_hour,end_hour,duration) %>% 
+ # summarise(num_sites_affected = n_distinct(atoll_site_id)) %>% 
+ #  mutate(percentage_affected=num_sites_affected/total_site_cnt)
   
-# Join to historical ls data to get
+# Join to historical ls data to get which sites went down when
 
 affected_sites_ls_history=left_join(freq_sites_affected,loadshedding_history_clean,by=c('day_of_month','stage')) 
 
+affected_sites_ls_history
 
-avg_percentage=affected_sites_ls_history %>% group_by(stage,day_of_month,time_of_day) %>% summarise(avg_percentage_sites_affected=mean(percentage_affected))
 
-View(affected_sites_ls_history)
+affected_sites_ls_history %>% 
+  mutate(week_date = as_date(floor_date(ls_date, "week"))) %>% 
+  group_by(week_date,stage) %>% summarise(weekly_site_affected=n_distinct(atoll_site_id)) %>% filter(year(week_date)==2022)
+
+affected_sites_ls_history %>% mutate(week_date = as_date(floor_date(ls_date, "week"))) %>% 
+  filter(year(ls_date)==2022) %>% 
+  group_by(week_date,stage) %>% summarise(sum(num_sites_affected)) %>% 
+  mutate
+
 ```
 
 ### Empirical distribution of the weekly stage
@@ -1105,6 +1687,7 @@ $$
 ```{r}
 
 # Frequency of load shedding schedules by week, in 2022 as these were load shedding heavy years
+# Get the mode stage level per week
 
 weekly = loadshedding_history_clean %>%
   mutate(week_date = as_date(floor_date(ls_date, "week")),
@@ -1133,12 +1716,14 @@ stage_table = weekly_full %>%
          cum_prob = cumsum(prob)) # cumulative probability of that stage
 
 
-stage_table %>%
-  filter(n_weeks > 0) %>%
-  select(n_weeks, stage,prob,) %>%
-  write.table("clipboard", sep = "\t", row.names = FALSE, col.names = FALSE)
-    
-write_clip(stage_table)
+
+
+weekly_cnts=affected_sites_ls_history %>% mutate(week_date = as_date(floor_date(ls_date, "week"))) %>% 
+  filter(year(ls_date)==2022) %>% 
+  group_by(week_date,stage) %>% n_distinct()
+
+weekly %>% mutate(stage=factor(stage)) %>% inner_join(weekly_cnts,by=c('week_date','stage'))
+
 ```
 
 ```{r}
@@ -1180,7 +1765,26 @@ stage_pct <- week_pct %>%
 # 6. Realised 2022 weeks (join to the weekly stage you built earlier)
 realised <- weekly_full %>% 
    mutate(stage=factor(stage, level=ls_levels)) %>% 
-left_join(week_pct, by = c("week_date", "stage"));realised
+left_join(week_pct, by = c("week_date", "stage"));
+
+# Weekly averages
+realised %>% group_by(stage) %>% summarise(average_weekly_affected=mean(week_pct))
+
+realised %>% group_by(stage) %>% summarise(mean(week_pct))
+```
+
+```{r}
+install.packages("writexl")
+library(writexl)
+
+
+site_rev_ranking=st_drop_geometry(cpt_site_ranges_rev_gdf) %>% arrange(desc(monthly_rev)) %>% mutate(rev_ranking=row_number()) %>% select(atoll_site_id,rev_ranking)
+
+
+
+# 2. Export a single dataframe
+# Syntax: write_xlsx(dataframe, "path/to/filename.xlsx")
+write_xlsx(site_rev_ranking, "site_rev_ranking.xlsx")
 ```
 
 Simulation Flow:\

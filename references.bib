@@ -1,0 +1,124 @@
+% =============================================================================
+% references.bib - generator placement / coverage neighbourhood model
+% Entries marked [verified] were checked against an online source while
+% preparing this file. Entries marked [check] come from memory and should be
+% confirmed (year, edition, publisher) before submission.
+% =============================================================================
+
+% ---- Covering location models: the framework a_ij belongs to ---------------
+
+% [verified]
+@article{toregas1971,
+  author  = {Toregas, Constantine and Swain, Ralph and ReVelle, Charles and Bergman, Lawrence},
+  title   = {The Location of Emergency Service Facilities},
+  journal = {Operations Research},
+  volume  = {19},
+  number  = {6},
+  pages   = {1363--1373},
+  year    = {1971}
+}
+
+% [verified]
+@article{churchrevelle1974,
+  author  = {Church, Richard and ReVelle, Charles},
+  title   = {The Maximal Covering Location Problem},
+  journal = {Papers of the Regional Science Association},
+  volume  = {32},
+  pages   = {101--118},
+  year    = {1974},
+  doi     = {10.1007/BF01942293}
+}
+
+% [check] confirm the publication year on the Springer page
+@book{churchmurray2018,
+  author    = {Church, Richard L. and Murray, Alan T.},
+  title     = {Location Covering Models: History, Applications and Advancements},
+  series    = {Advances in Spatial Science},
+  publisher = {Springer},
+  year      = {2018}
+}
+
+% ---- Adjacency / contiguity: why cell adjacency defines neighbours ----------
+
+% [verified: bibliographic details; chapter for neighbour definition not checked]
+@book{okabe2000,
+  author    = {Okabe, Atsuyuki and Boots, Barry and Sugihara, Kokichi and Chiu, Sung Nok},
+  title     = {Spatial Tessellations: Concepts and Applications of Voronoi Diagrams},
+  edition   = {2},
+  publisher = {Wiley},
+  year      = {2000},
+  isbn      = {978-0-471-98635-5}
+}
+
+% [check]
+@book{anselin1988,
+  author    = {Anselin, Luc},
+  title     = {Spatial Econometrics: Methods and Models},
+  publisher = {Kluwer Academic Publishers},
+  address   = {Dordrecht},
+  year      = {1988}
+}
+
+% [check] standard computational geometry text (Voronoi diagrams, Delaunay
+% triangulations, proximity of geometric objects)
+@book{deberg2008,
+  author    = {de Berg, Mark and Cheong, Otfried and van Kreveld, Marc and Overmars, Mark},
+  title     = {Computational Geometry: Algorithms and Applications},
+  edition   = {3},
+  publisher = {Springer},
+  address   = {Berlin, Heidelberg},
+  year      = {2008}
+}
+
+% ---- Computing the polygon-to-polygon distance (software and standard) ------
+
+% [verified] the sf package: st_distance, st_is_within_distance, st_touches
+@article{pebesma2018,
+  author  = {Pebesma, Edzer},
+  title   = {{Simple Features for R: Standardized Support for Spatial Vector Data}},
+  journal = {{The R Journal}},
+  volume  = {10},
+  number  = {1},
+  pages   = {439--446},
+  year    = {2018},
+  doi     = {10.32614/RJ-2018-009}
+}
+
+% [verified]
+@book{pebesma2023,
+  author    = {Pebesma, Edzer and Bivand, Roger},
+  title     = {{Spatial Data Science: With Applications in R}},
+  publisher = {{Chapman and Hall/CRC}},
+  year      = {2023},
+  doi       = {10.1201/9780429459016},
+  url       = {https://r-spatial.org/book/}
+}
+
+% [check] the Simple Features standard cited by Pebesma (2018); confirm the
+% document number and edition before use
+@techreport{herring2011,
+  author       = {Herring, John R.},
+  title        = {{OpenGIS Implementation Standard for Geographic Information: Simple Feature Access, Part 1: Common Architecture}},
+  institution  = {Open Geospatial Consortium},
+  year         = {2011},
+  number       = {OGC 06-103r4}
+}
+
+% ---- Radio planning tool and site definition --------------------------------
+
+% [check] cited by other papers; use the Atoll version your company runs
+@manual{forsk2015,
+  author       = {{Forsk}},
+  title        = {Atoll 3.3.0 Technical Reference Guide: Radio Networks},
+  organization = {Forsk},
+  year         = {2015}
+}
+
+
+@misc{beasley_integer_programming,
+  author       = {Beasley, J. E.},
+  title        = {Integer Programming Solution Methods},
+  howpublished = {\url{https://people.brunel.ac.uk/~mastjjb/jeb/natcor_ip_rest.pdf}},
+  institution  = {Brunel University London},
+  note         = {Lecture notes}
+}
